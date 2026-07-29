@@ -124,7 +124,7 @@ body::before {
 .segments button { background: transparent; border: none; color: var(--text-2); padding: 6px 12px; font-size: 13px; font-weight: 500; font-family: var(--font); border-radius: 6px; transition: all 0.2s var(--spring); cursor: pointer; white-space: nowrap; }
 .segments button.active { background: var(--bg-hover); color: var(--text-1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.4); border: 1px solid var(--border); }
 
-.table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap { width: 100%; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; }
 th { padding: 10px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-3); font-weight: 600; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); z-index: 2; }
 td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -155,7 +155,7 @@ tr.clickable:active { background: rgba(255,255,255,0.05); }
 .desktop-nav button:hover { background: var(--bg-surface); color: var(--text-1); }
 .desktop-nav button.active { background: var(--bg-surface); color: var(--text-1); border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 4px rgba(0,0,0,0.2); }
 
-.heatmap-wrap { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+.heatmap-wrap { width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
 
 /* Badge Buttons (Time and Data Switch) */
 .time-badge { background: #1e1b4b; color: #818cf8; border: 1px solid #312e81; border-radius: 10px; padding: 2px 8px; font-size: 10px; font-weight: 700; font-family: var(--mono); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
