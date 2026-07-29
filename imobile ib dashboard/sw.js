@@ -1,10 +1,10 @@
-const CACHE_NAME = 'prsh-cache-v16';
+const CACHE_NAME = 'prsh-cache-v18';
 const PRECACHE_URLS = [
   '/prshresearch/',
-  '/prshresearch/index.html',
-  '/prshresearch/dashboard.html',
-  '/prshresearch/styles.css',
-  '/prshresearch/main.js',
+  '/prshresearch/index.html?bust=1',
+  '/prshresearch/dashboard.html?bust=1',
+  '/prshresearch/styles.css?bust=1',
+  '/prshresearch/main.js?bust=1',
   '/prshresearch/data/time_range_10m.json',
   '/prshresearch/data/time_range_120m.json',
   '/prshresearch/data/time_range_15m.json',
@@ -55,7 +55,7 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
       if (cachedResponse) {
         // Fetch in background to update cache (stale-while-revalidate)
         event.waitUntil(
