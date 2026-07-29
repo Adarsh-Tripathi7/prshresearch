@@ -1,17 +1,17 @@
-const CACHE_NAME = 'prsh-cache-v9';
+const CACHE_NAME = 'prsh-cache-v10';
 const PRECACHE_URLS = [
-  './',
-  './index.html',
-  './time_range_60m.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './favicon.ico',
-  './styles.css',
-  './main.js',
-  './offline.html',
-  './pdr_analysis.html',
-  './pwr_analysis.html'
+  '/prshresearch/',
+  '/prshresearch/index.html',
+  '/prshresearch/time_range_60m.html',
+  '/prshresearch/manifest.json',
+  '/prshresearch/icon-192.png',
+  '/prshresearch/icon-512.png',
+  '/prshresearch/favicon.ico',
+  '/prshresearch/styles.css',
+  '/prshresearch/main.js',
+  '/prshresearch/offline.html',
+  '/prshresearch/pdr_analysis.html',
+  '/prshresearch/pwr_analysis.html'
 ];
 
 self.addEventListener('install', (event) => {
@@ -72,7 +72,7 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Return offline page for navigation requests (HTML pages)
         if (event.request.mode === 'navigate') {
-          return caches.match('./offline.html');
+          return caches.match('/prshresearch/offline.html');
         }
         // For API data or other assets, we just return undefined/fail silently
       });
