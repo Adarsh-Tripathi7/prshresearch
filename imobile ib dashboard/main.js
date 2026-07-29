@@ -6,10 +6,10 @@ let EXT = {};
 window.loadTimeframeData = async function(tf) {
   try {
     const res = await fetch(`data/${tf}.json`);
-    const _D = await res.json();
-    probData = _D.prob || [];
-    corrData = _D.corr || [];
-    EXT = _D.ext || {};
+    window._D = await res.json();
+    probData = window._D.prob || [];
+    corrData = window._D.corr || [];
+    EXT = window._D.ext || {};
     
     const labelMatch = tf.match(/time_range_(.+)/);
     if (labelMatch && $('timeBadgeBtn')) {
@@ -42,15 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  if (document.querySelectorAll('.tf-btn').length > 0) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const tf = urlParams.get('tf') || 'time_range_60m';
-      
-      const btn = document.querySelector(`.tf-btn[data-tf="${tf}"]`);
-      if (btn) btn.classList.add('active');
-      
-      loadTimeframeData(tf);
-  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const tf = urlParams.get('tf') || 'time_range_60m';
+  
+  const btn = document.querySelector(`.tf-btn[data-tf="${tf}"]`);
+  if (btn) btn.classList.add('active');
+  
+  loadTimeframeData(tf);
 });
 
 window.addEventListener('popstate', (e) => {
@@ -249,36 +247,25 @@ btnGlobalAsset.addEventListener('click', () => {
   updateAllDashboards();
 });
 
-const timeframes = [
-  'time_range_7m.html', 'time_range_7m_1m_step.html', 'time_range_10m.html', 
-  'time_range_15m.html', 'time_range_15m_step.html', 'time_range_30m.html', 
-  'time_range_30m_15m_step.html', 'time_range_45m.html', 'time_range_60m.html', 'time_range_120m.html'
-];
-timeBadgeBtn.addEventListener('click', async (e) => {
+timeBadgeBtn.addEventListener('click', (e) => {
   e.preventDefault();
-  const current = window.location.pathname.split('/').pop() || 'time_range_60m.html';
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const current = urlParams.get('tf') || 'time_range_60m';
+  
+  const timeframes = [
+    'time_range_7m', 'time_range_7m_1m_step', 'time_range_10m', 
+    'time_range_15m', 'time_range_15m_step', 'time_range_30m', 
+    'time_range_30m_15m_step', 'time_range_45m', 'time_range_60m', 'time_range_120m'
+  ];
+  
   let idx = timeframes.indexOf(current);
   if (idx === -1) idx = 0;
   const nextIdx = (idx + 1) % timeframes.length;
-  const nextFile = timeframes[nextIdx];
+  const nextTf = timeframes[nextIdx];
   
-  try {
-      const res = await fetch(nextFile);
-      const text = await res.text();
-      const match = text.match(/const _D = (\{.*?\});/);
-      if (match) {
-          const newD = JSON.parse(match[1]);
-          // We can't reassign a const _D, but we can assign its properties if we change _D to var or let.
-          // Wait, _D is const in the HTML script tag.
-          // This fetch update without reload won't work perfectly if _D is const, BUT:
-          // The old logic was designed to work around this. Let's just reload the page on click.
-          window.location.href = nextFile;
-      } else {
-          window.location.href = nextFile;
-      }
-  } catch(err) {
-      window.location.href = nextFile;
-  }
+  window.history.pushState({tf: nextTf}, '', `dashboard.html?tf=${nextTf}`);
+  loadTimeframeData(nextTf);
 });
 
 window.addEventListener('popstate', () => {
