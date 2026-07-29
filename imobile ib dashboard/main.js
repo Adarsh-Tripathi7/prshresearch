@@ -637,8 +637,18 @@ updateExt();
 let hmSortCol = null, hmSortDir = 0;
 
 function updateHeatmap() {
-  const type = segVal('segHmType'); const dir = segVal('segHmDir');
+  const hmContainer = $('chartHeatmap');
+  if (!hmContainer) return;
   const c = ec('chartHeatmap'); const dom = c.getDom();
+  
+  const type = segVal('segHmType'); const dir = segVal('segHmDir');
+  if (type === 'prob') {
+      dom.style.minWidth = '100%';
+  } else if (type === 'corr') {
+      dom.style.minWidth = '500px';
+  } else {
+      dom.style.minWidth = '1000px';
+  }
   
   if (!c._hasSort) {
     c.on('click', function(p) {
