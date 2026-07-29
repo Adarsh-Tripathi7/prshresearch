@@ -132,7 +132,7 @@ $('spotClose').addEventListener('click', () => { $('spotlight').classList.remove
 function showSpotlight(win) {
   $('spotTitle').innerHTML = `Window: ${win}`;
   const p = probData.find(d => d.Window === win);
-  const pf = (typeof _D !== 'undefined' && _D.prob_first) ? _D.prob_first.find(d => d.Window === win) : null;
+  const pf = (window._D && window._D.prob_first) ? window._D.prob_first.find(d => d.Window === win) : null;
   const currentView = document.querySelector('.page.active')?.id || 'page-overview';
   let html = '';
   
@@ -455,7 +455,7 @@ let hlFirstSortCol = 'Window', hlFirstSortDir = 0;
 
 function updateHlFirst() {
   const dir = segVal('segHlFirstDir') || 'high_first';
-  const data = typeof _D !== 'undefined' ? _D.prob_first : [];
+  const data = window._D?.prob_first || [];
   if (!data || !data.length) return;
   
   let mappedData = data.map(d => {
@@ -690,11 +690,11 @@ function updateHeatmap() {
   
   const type = segVal('segHmType'); const dir = segVal('segHmDir');
   if (type === 'prob') {
-      dom.style.minWidth = '100%';
+      dom.style.minWidth = '350px';
   } else if (type === 'corr') {
       dom.style.minWidth = '500px';
   } else {
-      dom.style.minWidth = '1000px';
+      dom.style.minWidth = '1400px';
   }
   
   if (!c._hasSort) {
