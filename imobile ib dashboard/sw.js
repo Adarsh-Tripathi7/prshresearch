@@ -1,14 +1,24 @@
-const CACHE_NAME = 'prsh-cache-v12';
+const CACHE_NAME = 'prsh-cache-v13';
 const PRECACHE_URLS = [
   '/prshresearch/',
   '/prshresearch/index.html',
-  '/prshresearch/time_range_60m.html',
+  '/prshresearch/dashboard.html',
+  '/prshresearch/styles.css',
+  '/prshresearch/main.js',
+  '/prshresearch/data/time_range_10m.json',
+  '/prshresearch/data/time_range_120m.json',
+  '/prshresearch/data/time_range_15m.json',
+  '/prshresearch/data/time_range_15m_step.json',
+  '/prshresearch/data/time_range_30m.json',
+  '/prshresearch/data/time_range_30m_15m_step.json',
+  '/prshresearch/data/time_range_45m.json',
+  '/prshresearch/data/time_range_60m.json',
+  '/prshresearch/data/time_range_7m.json',
+  '/prshresearch/data/time_range_7m_1m_step.json',
   '/prshresearch/manifest.json',
   '/prshresearch/icon-192.png',
   '/prshresearch/icon-512.png',
   '/prshresearch/favicon.ico',
-  '/prshresearch/styles.css',
-  '/prshresearch/main.js',
   '/prshresearch/offline.html',
   '/prshresearch/pdr_analysis.html',
   '/prshresearch/pwr_analysis.html'

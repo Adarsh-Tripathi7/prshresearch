@@ -1,7 +1,67 @@
 
-let probData = typeof _D !== 'undefined' ? _D.prob : [];
-let corrData = (typeof _D !== 'undefined' && _D.corr) ? _D.corr : [];
-let EXT = (typeof _D !== 'undefined' && _D.ext) ? _D.ext : {};
+let probData = [];
+let corrData = [];
+let EXT = {};
+
+window.loadTimeframeData = async function(tf) {
+  try {
+    const res = await fetch(`data/${tf}.json`);
+    const _D = await res.json();
+    probData = _D.prob || [];
+    corrData = _D.corr || [];
+    EXT = _D.ext || {};
+    
+    const labelMatch = tf.match(/time_range_(.+)/);
+    if (labelMatch && $('timeBadgeBtn')) {
+       let lbl = labelMatch[1].toUpperCase().replace(/_1M_STEP/g, ' / 1M STEP').replace(/_15M_STEP/g, ' / 15M STEP');
+       $('timeBadgeBtn').innerText = lbl;
+       document.title = 'Prsh Capital | ' + lbl;
+    }
+    
+    if (typeof updateAllDashboards === 'function') {
+        updateAllDashboards();
+    }
+    const menu = $('timeMenu');
+    if (menu) menu.classList.remove('open');
+  } catch (e) {
+    console.error("Failed to load data for", tf, e);
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.tf-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const tf = btn.getAttribute('data-tf');
+      if (tf) {
+        window.history.pushState({tf: tf}, '', `dashboard.html?tf=${tf}`);
+        loadTimeframeData(tf);
+        document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+    });
+  });
+  
+  if (document.querySelectorAll('.tf-btn').length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tf = urlParams.get('tf') || 'time_range_60m';
+      
+      const btn = document.querySelector(`.tf-btn[data-tf="${tf}"]`);
+      if (btn) btn.classList.add('active');
+      
+      loadTimeframeData(tf);
+  }
+});
+
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.tf) {
+    loadTimeframeData(e.state.tf);
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.querySelector(`.tf-btn[data-tf="${e.state.tf}"]`);
+    if (btn) btn.classList.add('active');
+  }
+});
+
 const PCT = ['5%','10%','15%','20%','25%','30%','35%','40%','45%','50%','55%','60%','65%','70%','75%','80%','85%','90%','95%','100%'];
 function pctLabel(p) { return p === '100%' ? 'MAX' : (100 - parseInt(p)) + '%'; }
 const extLabels = PCT.map(pctLabel);
