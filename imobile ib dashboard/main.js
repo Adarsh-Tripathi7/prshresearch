@@ -4,6 +4,8 @@ let corrData = [];
 let EXT = {};
 
 window.loadTimeframeData = async function(tf) {
+  const loader = $('loader');
+  if (loader) loader.classList.add('active');
   try {
     const res = await fetch(`data/${tf}.json`);
     window._D = await res.json();
@@ -25,6 +27,8 @@ window.loadTimeframeData = async function(tf) {
     if (menu) menu.classList.remove('open');
   } catch (e) {
     console.error("Failed to load data for", tf, e);
+  } finally {
+    if (loader) setTimeout(() => loader.classList.remove('active'), 100);
   }
 };
 
