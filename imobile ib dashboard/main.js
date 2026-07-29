@@ -2,6 +2,44 @@
 let probData = [];
 let corrData = [];
 let EXT = {};
+let probFirstData = [];
+
+window.globalSession = localStorage.getItem('prsh_global_session') || 'all';
+
+function isRTH(winStr) {
+    if (!winStr) return false;
+    let start = winStr.split('-')[0];
+    return start >= "09:30" && start < "16:00";
+}
+
+window.applySessionFilter = function() {
+    function filterArr(arr) {
+        if (!arr) return [];
+        if (window.globalSession === 'all') return [...arr];
+        return arr.filter(d => {
+            if (!d.Window) return true;
+            let rth = isRTH(d.Window);
+            return window.globalSession === 'rth' ? rth : !rth;
+        });
+    }
+
+    probData = filterArr(window._D.prob || []);
+    corrData = filterArr(window._D.corr || []);
+    probFirstData = filterArr(window._D.prob_first || []);
+    
+    EXT = {};
+    if (window._D.ext) {
+        for (let asset in window._D.ext) {
+            EXT[asset] = {};
+            for (let btype in window._D.ext[asset]) {
+                EXT[asset][btype] = {};
+                for (let dir in window._D.ext[asset][btype]) {
+                    EXT[asset][btype][dir] = filterArr(window._D.ext[asset][btype][dir]);
+                }
+            }
+        }
+    }
+}
 
 window.loadTimeframeData = async function(tf) {
   const loader = $('loader');
@@ -9,9 +47,7 @@ window.loadTimeframeData = async function(tf) {
   try {
     const res = await fetch(`data/${tf}.json`);
     window._D = await res.json();
-    probData = window._D.prob || [];
-    corrData = window._D.corr || [];
-    EXT = window._D.ext || {};
+    window.applySessionFilter();
     
     const labelMatch = tf.match(/time_range_(.+)/);
     if (labelMatch && $('timeBadgeBtn')) {
@@ -136,7 +172,7 @@ $('spotClose').addEventListener('click', () => { $('spotlight').classList.remove
 function showSpotlight(win) {
   $('spotTitle').innerHTML = `Window: ${win}`;
   const p = probData.find(d => d.Window === win);
-  const pf = (window._D && window._D.prob_first) ? window._D.prob_first.find(d => d.Window === win) : null;
+  const pf = probFirstData.find(d => d.Window === win);
   const currentView = document.querySelector('.page.active')?.id || 'page-overview';
   let html = '';
   
@@ -236,10 +272,14 @@ function showSpotlight(win) {
 // Global UI State
 let globalAsset = localStorage.getItem('prsh_global_asset') || 'both'; // 'both', 'nq', 'es'
 const btnGlobalAsset = $('btnGlobalAsset');
+const btnSessionFilter = $('btnSessionFilter');
 const timeBadgeBtn = $('timeBadgeBtn');
 
 // Initialize button text on load
 btnGlobalAsset.innerHTML = globalAsset === 'both' ? 'NQ | ES' : globalAsset.toUpperCase();
+if (btnSessionFilter) {
+  btnSessionFilter.innerHTML = window.globalSession === 'all' ? 'ALL' : (window.globalSession === 'rth' ? 'RTH' : 'ETH');
+}
 
 btnGlobalAsset.addEventListener('click', () => {
   if (globalAsset === 'both') globalAsset = 'nq';
@@ -250,6 +290,20 @@ btnGlobalAsset.addEventListener('click', () => {
   btnGlobalAsset.innerHTML = globalAsset === 'both' ? 'NQ | ES' : globalAsset.toUpperCase();
   updateAllDashboards();
 });
+
+if (btnSessionFilter) {
+  btnSessionFilter.addEventListener('click', () => {
+    if (window.globalSession === 'all') window.globalSession = 'rth';
+    else if (window.globalSession === 'rth') window.globalSession = 'overnight';
+    else window.globalSession = 'all';
+    
+    localStorage.setItem('prsh_global_session', window.globalSession);
+    btnSessionFilter.innerHTML = window.globalSession === 'all' ? 'ALL' : (window.globalSession === 'rth' ? 'RTH' : 'ETH');
+    
+    window.applySessionFilter();
+    updateAllDashboards();
+  });
+}
 
 timeBadgeBtn.addEventListener('click', (e) => {
   e.preventDefault();
@@ -459,7 +513,7 @@ let hlFirstSortCol = 'Window', hlFirstSortDir = 0;
 
 function updateHlFirst() {
   const dir = segVal('segHlFirstDir') || 'high_first';
-  const data = window._D?.prob_first || [];
+  const data = probFirstData || [];
   if (!data || !data.length) return;
   
   let mappedData = data.map(d => {
