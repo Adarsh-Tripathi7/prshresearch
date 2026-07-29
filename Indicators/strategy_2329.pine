@@ -1,0 +1,117 @@
+//@version=6
+strategy("23:29 Long-Only Breakout", overlay=true, calc_on_every_tick=true, initial_capital=100000, margin_long=0, margin_short=0)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INPUTS
+// ═══════════════════════════════════════════════════════════════════════════════
+i_target_pct  = input.float(0.40, title="Target % of Range", step=0.05, group="Strategy Settings")
+i_window      = input.session("2329-2335", title="Time Window", group="Strategy Settings")
+i_timezone    = input.string("America/New_York", title="Exchange Timezone", group="Strategy Settings")
+i_end_h       = input.int(23, title="Window End Hour", group="Strategy Settings")
+i_end_m       = input.int(35, title="Window End Minute", group="Strategy Settings")
+i_exit_h      = input.int(16, title="Time Exit Hour", group="Strategy Settings", tooltip="Hour to force close the trade (e.g., 16 for 4 PM)")
+i_exit_m      = input.int(59, title="Time Exit Minute", group="Strategy Settings", tooltip="Minute to force close the trade (e.g., 59 for 4:59 PM)")
+
+i_risk_usd    = input.float(500.0, title="Fixed Risk Per Trade ($)", group="Risk Management")
+i_round_qty   = input.bool(true, title="Round to Whole Contracts", group="Risk Management", tooltip="Turn off if trading fractional CFDs")
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STATE VARIABLES
+// ═══════════════════════════════════════════════════════════════════════════════
+var float w_high = na
+var float w_low = na
+var bool can_trade = false
+var bool invalidated = false
+var bool trade_taken = false
+
+// Time tracking
+in_window = not na(time(timeframe.period, i_window, i_timezone))
+is_new_window = in_window and not in_window[1]
+is_after_window = not in_window and in_window[1]
+is_last_window_bar = in_window and hour(time, i_timezone) == i_end_h and minute(time, i_timezone) == i_end_m
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// WINDOW TRACKING
+// ═══════════════════════════════════════════════════════════════════════════════
+if is_new_window
+    w_high := high
+    w_low := low
+    can_trade := false
+    invalidated := false
+    trade_taken := false
+
+if in_window
+    w_high := math.max(w_high, high)
+    w_low := math.min(w_low, low)
+
+if is_after_window
+    can_trade := true
+
+// Mark if a trade has been filled today
+if strategy.position_size > 0
+    trade_taken := true
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TRADE LOGIC
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ensure we only enter once per session
+// Place the order on the LAST bar of the window so it is active for the very next bar
+if (is_last_window_bar or (can_trade and not in_window)) and strategy.position_size == 0 and not trade_taken
+    // Invalidate if price goes below the Low BEFORE entry is triggered
+    if low <= w_low and not in_window
+        invalidated := true
+        can_trade := false
+        strategy.cancel("Long")
+    
+    // If not invalidated, calculate position size and place entry
+    if not invalidated
+        float range_points = w_high - w_low
+        float risk_per_contract = range_points * syminfo.pointvalue
+        
+        float pos_qty = 0.0
+        if risk_per_contract > 0
+            pos_qty := i_risk_usd / risk_per_contract
+            if i_round_qty
+                pos_qty := math.max(1, math.round(pos_qty)) // Ensure at least 1 contract if rounding
+                
+        strategy.entry("Long", strategy.long, qty=pos_qty, stop=w_high)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TRADE MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+if strategy.position_size > 0
+    float range_val = w_high - w_low
+    float target_price = w_high + (range_val * i_target_pct)
+    float stop_price = w_low
+    
+    // Automatically submit TP and SL orders
+    strategy.exit("TP/SL", "Long", limit=target_price, stop=stop_price)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TIME EXIT
+// ═══════════════════════════════════════════════════════════════════════════════
+int current_h = hour(time, i_timezone)
+int current_m = minute(time, i_timezone)
+
+// Force exit at the specified time to mimic session close
+if current_h == i_exit_h and current_m >= i_exit_m
+    if strategy.position_size > 0
+        strategy.close("Long", comment="Time Exit")
+    can_trade := false
+    strategy.cancel("Long")
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VISUALS
+// ═══════════════════════════════════════════════════════════════════════════════
+// Draw a box around the 7-minute window so it's easy to verify visually
+var box window_box = na
+
+if is_new_window
+    window_box := box.new(left=bar_index, top=w_high, right=bar_index, bottom=w_low, 
+                          border_color=color.new(color.blue, 50), 
+                          bgcolor=color.new(color.blue, 90))
+
+if in_window
+    box.set_top(window_box, w_high)
+    box.set_bottom(window_box, w_low)
+    box.set_right(window_box, bar_index)

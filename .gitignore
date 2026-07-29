@@ -1,0 +1,16 @@
+# Data and Results
+Historical data/
+Results/
+
+# Node modules
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Scratch files
+scratch_js.txt
+temp.pine
+data.txt
