@@ -102,11 +102,32 @@
     <div class="grid">
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><div class="dot" style="background:var(--accent)"></div> High First / Low First Double Break %</div>
-          <div class="segments-scroll"><div class="segments" id="segHlFirstDir">
-            <button class="active" data-v="high_first">High First</button>
-            <button data-v="low_first">Low First</button>
-            <button data-v="combined">Combined</button>
+          <div class="card-title"><div class="dot" style="background:var(--accent)"></div> High / Low Sequence & Close Position Explorer</div>
+          <div class="segments-scroll"><div class="segments" id="segHlTarget">
+            <button class="active" data-v="break_high_first">Break High 1st</button>
+            <button data-v="break_low_first">Break Low 1st</button>
+            <button data-v="low_first_break_high">Low 1st → Break High</button>
+            <button data-v="high_first_break_low">High 1st → Break Low</button>
+            <button data-v="combined_opp">Combined Opposite</button>
+            <button data-v="compare_both">Compare High vs Low</button>
+          </div></div>
+          <div class="segments-scroll"><div class="segments" id="segClosePosTh">
+            <button class="active" data-v="none">All Closes</button>
+            <button data-v="25%">Top/Bot 25%</button>
+            <button data-v="30%">Top/Bot 30%</button>
+            <button data-v="35%">Top/Bot 35%</button>
+            <button data-v="40%">Top/Bot 40%</button>
+            <button data-v="45%">Top/Bot 45%</button>
+            <button data-v="50%">Top/Bot 50%</button>
+          </div></div>
+          <div class="segments-scroll"><div class="segments" id="segHlSort">
+            <button class="active" data-v="time">Time</button>
+            <button data-v="high_desc">High Break % ↓</button>
+            <button data-v="low_desc">Low Break % ↓</button>
+            <button data-v="low_first_edge">Low 1st Edge ↓</button>
+            <button data-v="high_first_edge">High 1st Edge ↓</button>
+            <button data-v="skew_desc">Direction Skew ↓</button>
+            <button data-v="count_desc">Samples ↓</button>
           </div></div>
         </div>
         <div class="card-body"><div id="chartHlFirst" class="echart" style="height:400px"></div></div>

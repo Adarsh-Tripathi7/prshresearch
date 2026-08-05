@@ -3,6 +3,7 @@ let probData = [];
 let corrData = [];
 let EXT = {};
 let probFirstData = [];
+let closePosData = [];
 
 window.globalSession = localStorage.getItem('prsh_global_session') || 'all';
 
@@ -26,6 +27,7 @@ window.applySessionFilter = function() {
     probData = filterArr(window._D.prob || []);
     corrData = filterArr(window._D.corr || []);
     probFirstData = filterArr(window._D.prob_first || []);
+    closePosData = filterArr(window._D.close_pos || []);
     
     EXT = {};
     if (window._D.ext) {
@@ -82,14 +84,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  const urlParams = new URLSearchParams(window.location.search);
-  const tf = urlParams.get('tf') || 'time_range_60m';
-  
-  const btn = document.querySelector(`.tf-btn[data-tf="${tf}"]`);
-  if (btn) btn.classList.add('active');
-  
-  loadTimeframeData(tf);
+  // If data is already embedded in the page (standalone time_range_*.html),
+  // use it directly without fetching. Otherwise fetch from data/ folder.
+  if (window._D && window._D.prob && window._D.prob.length > 0) {
+    // Standalone page with embedded data — just filter and render
+    window.applySessionFilter();
+    if (typeof updateAllDashboards === 'function') updateAllDashboards();
+  } else {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tf = urlParams.get('tf') || 'time_range_60m';
+    const btn = document.querySelector(`.tf-btn[data-tf="${tf}"]`);
+    if (btn) btn.classList.add('active');
+    loadTimeframeData(tf);
+  }
 });
+
 
 window.addEventListener('popstate', (e) => {
   if (e.state && e.state.tf) {
@@ -308,22 +317,31 @@ if (btnSessionFilter) {
 timeBadgeBtn.addEventListener('click', (e) => {
   e.preventDefault();
   
-  const urlParams = new URLSearchParams(window.location.search);
-  const current = urlParams.get('tf') || 'time_range_60m';
-  
   const timeframes = [
     'time_range_7m', 'time_range_7m_1m_step', 'time_range_10m', 
     'time_range_15m', 'time_range_15m_step', 'time_range_30m', 
     'time_range_30m_15m_step', 'time_range_45m', 'time_range_60m', 'time_range_120m'
   ];
   
+  // Detect current timeframe: first try page filename, then URL param
+  const pageName = window.location.pathname.split('/').pop().replace('.html', '');
+  const urlParams = new URLSearchParams(window.location.search);
+  const current = timeframes.includes(pageName)
+    ? pageName
+    : (urlParams.get('tf') || 'time_range_60m');
+  
   let idx = timeframes.indexOf(current);
   if (idx === -1) idx = 0;
-  const nextIdx = (idx + 1) % timeframes.length;
-  const nextTf = timeframes[nextIdx];
+  const nextTf = timeframes[(idx + 1) % timeframes.length];
   
-  window.history.pushState({tf: nextTf}, '', `dashboard.html?tf=${nextTf}`);
-  loadTimeframeData(nextTf);
+  // On standalone time_range_*.html pages, navigate directly to next standalone page
+  if (timeframes.includes(pageName)) {
+    window.location.href = `${nextTf}.html`;
+  } else {
+    // SPA / dashboard.html mode — fetch data in-place
+    window.history.pushState({tf: nextTf}, '', `dashboard.html?tf=${nextTf}`);
+    loadTimeframeData(nextTf);
+  }
 });
 
 window.addEventListener('popstate', () => {
@@ -512,107 +530,312 @@ updateProb();
 let hlFirstSortCol = 'Window', hlFirstSortDir = 0;
 
 function updateHlFirst() {
-  const dir = segVal('segHlFirstDir') || 'high_first';
-  const data = probFirstData || [];
-  if (!data || !data.length) return;
+  const target = segVal('segHlTarget') || 'break_high_first';
+  const closePosThreshold = segVal('segClosePosTh') || 'none';
+  const qSort = segVal('segHlSort') || 'time';
   
-  let mappedData = data.map(d => {
-    let n, e, n_cond, e_cond;
-    if (dir === 'high_first') {
-        n = d.NQ_H_First_L_Break_Prob;
-        e = d.ES_H_First_L_Break_Prob;
-        n_cond = d.NQ_H_First_CBM_Prob;
-        e_cond = d.ES_H_First_CBM_Prob;
-    } else if (dir === 'low_first') {
-        n = d.NQ_L_First_H_Break_Prob;
-        e = d.ES_L_First_H_Break_Prob;
-        n_cond = d.NQ_L_First_CAM_Prob;
-        e_cond = d.ES_L_First_CAM_Prob;
+  const rawData = (closePosData && closePosData.length) ? closePosData : (probFirstData || []);
+  if (!rawData || !rawData.length) return;
+  
+  const isCompare = target === 'compare_both';
+  
+  let mappedData = rawData.map((d, origIdx) => {
+    let nq = 0, es = 0, nq_tot = 0, es_tot = 0;
+    let nq_high = 0, nq_low = 0, es_high = 0, es_low = 0;
+    let nq_lf_edge = 0, es_lf_edge = 0, nq_hf_edge = 0, es_hf_edge = 0;
+    
+    const nq_hf = d.NQ_HF_Total || 0, nq_lf = d.NQ_LF_Total || 0;
+    const es_hf = d.ES_HF_Total || 0, es_lf = d.ES_LF_Total || 0;
+    const nq_all = nq_hf + nq_lf;
+    const es_all = es_hf + es_lf;
+
+    if (closePosThreshold === 'none') {
+      nq_high = nq_all > 0 ? (((d.NQ_HighFirst_BreakHighFirst_Prob || 0) * nq_hf + (d.NQ_LowFirst_BreakHighFirst_Prob || 0) * nq_lf) / nq_all) : (d.NQ_L_First_H_Break_Prob || 0);
+      nq_low = nq_all > 0 ? (((d.NQ_HighFirst_BreakLowFirst_Prob || 0) * nq_hf + (d.NQ_LowFirst_BreakLowFirst_Prob || 0) * nq_lf) / nq_all) : (d.NQ_H_First_L_Break_Prob || 0);
+      es_high = es_all > 0 ? (((d.ES_HighFirst_BreakHighFirst_Prob || 0) * es_hf + (d.ES_LowFirst_BreakHighFirst_Prob || 0) * es_lf) / es_all) : (d.ES_L_First_H_Break_Prob || 0);
+      es_low = es_all > 0 ? (((d.ES_HighFirst_BreakLowFirst_Prob || 0) * es_hf + (d.ES_LowFirst_BreakLowFirst_Prob || 0) * es_lf) / es_all) : (d.ES_H_First_L_Break_Prob || 0);
+      
+      nq_lf_edge = d.NQ_LowFirst_BreakHighFirst_Prob ?? d.NQ_L_First_H_Break_Prob ?? 0;
+      es_lf_edge = d.ES_LowFirst_BreakHighFirst_Prob ?? d.ES_L_First_H_Break_Prob ?? 0;
+      nq_hf_edge = d.NQ_HighFirst_BreakLowFirst_Prob ?? d.NQ_H_First_L_Break_Prob ?? 0;
+      es_hf_edge = d.ES_HighFirst_BreakLowFirst_Prob ?? d.ES_H_First_L_Break_Prob ?? 0;
     } else {
-        n = d.NQ_Comb_Opp_Prob;
-        e = d.ES_Comb_Opp_Prob;
-        n_cond = d.NQ_Comb_Cond_Prob;
-        e_cond = d.ES_Comb_Cond_Prob;
+      nq_high = d[`NQ_Top${closePosThreshold}_BreakHighFirst_Prob`] ?? 0;
+      nq_low = d[`NQ_Bot${closePosThreshold}_BreakLowFirst_Prob`] ?? 0;
+      es_high = d[`ES_Top${closePosThreshold}_BreakHighFirst_Prob`] ?? 0;
+      es_low = d[`ES_Bot${closePosThreshold}_BreakLowFirst_Prob`] ?? 0;
+
+      nq_lf_edge = d[`NQ_LowFirst_Top${closePosThreshold}_BreakHighFirst_Prob`] ?? 0;
+      es_lf_edge = d[`ES_LowFirst_Top${closePosThreshold}_BreakHighFirst_Prob`] ?? 0;
+      nq_hf_edge = d[`NQ_HighFirst_Bot${closePosThreshold}_BreakLowFirst_Prob`] ?? 0;
+      es_hf_edge = d[`ES_HighFirst_Bot${closePosThreshold}_BreakLowFirst_Prob`] ?? 0;
     }
-    return { Window: d.Window, nq: n, es: e, avg: n&&e?(n+e)/2:0, delta: n&&e?(n-e):0, nq_cond: n_cond, es_cond: e_cond, cond_avg: n_cond&&e_cond?(n_cond+e_cond)/2:0 };
-  }).filter(d => d.nq !== undefined && d.es !== undefined);
-  
+    
+    if (target === 'break_high_first') {
+      nq = nq_high;
+      es = es_high;
+      nq_tot = closePosThreshold === 'none' ? nq_all : (d[`NQ_Top${closePosThreshold}_Total`] ?? 0);
+      es_tot = closePosThreshold === 'none' ? es_all : (d[`ES_Top${closePosThreshold}_Total`] ?? 0);
+    } else if (target === 'break_low_first') {
+      nq = nq_low;
+      es = es_low;
+      nq_tot = closePosThreshold === 'none' ? nq_all : (d[`NQ_Bot${closePosThreshold}_Total`] ?? 0);
+      es_tot = closePosThreshold === 'none' ? es_all : (d[`ES_Bot${closePosThreshold}_Total`] ?? 0);
+    } else if (target === 'low_first_break_high') {
+      nq = nq_lf_edge;
+      es = es_lf_edge;
+      nq_tot = closePosThreshold === 'none' ? nq_lf : (d[`NQ_LowFirst_Top${closePosThreshold}_Total`] ?? 0);
+      es_tot = closePosThreshold === 'none' ? es_lf : (d[`ES_LowFirst_Top${closePosThreshold}_Total`] ?? 0);
+    } else if (target === 'high_first_break_low') {
+      nq = nq_hf_edge;
+      es = es_hf_edge;
+      nq_tot = closePosThreshold === 'none' ? nq_hf : (d[`NQ_HighFirst_Bot${closePosThreshold}_Total`] ?? 0);
+      es_tot = closePosThreshold === 'none' ? es_hf : (d[`ES_HighFirst_Bot${closePosThreshold}_Total`] ?? 0);
+    } else if (target === 'combined_opp') {
+      if (closePosThreshold === 'none') {
+        nq_tot = nq_hf + nq_lf;
+        es_tot = es_hf + es_lf;
+        nq = nq_tot > 0 ? (((d.NQ_HighFirst_BreakLowFirst_Prob || 0) * nq_hf + (d.NQ_LowFirst_BreakHighFirst_Prob || 0) * nq_lf) / nq_tot) : (d.NQ_Comb_Opp_Prob || 0);
+        es = es_tot > 0 ? (((d.ES_HighFirst_BreakLowFirst_Prob || 0) * es_hf + (d.ES_LowFirst_BreakHighFirst_Prob || 0) * es_lf) / es_tot) : (d.ES_Comb_Opp_Prob || 0);
+      } else {
+        const nq_l = d[`NQ_LowFirst_Top${closePosThreshold}_Total`] || 0, nq_h = d[`NQ_HighFirst_Bot${closePosThreshold}_Total`] || 0;
+        nq_tot = nq_l + nq_h;
+        nq = nq_tot > 0 ? (((d[`NQ_LowFirst_Top${closePosThreshold}_BreakHighFirst_Prob`] || 0) * nq_l + (d[`NQ_HighFirst_Bot${closePosThreshold}_BreakLowFirst_Prob`] || 0) * nq_h) / nq_tot) : 0;
+        
+        const es_l = d[`ES_LowFirst_Top${closePosThreshold}_Total`] || 0, es_h = d[`ES_HighFirst_Bot${closePosThreshold}_Total`] || 0;
+        es_tot = es_l + es_h;
+        es = es_tot > 0 ? (((d[`ES_LowFirst_Top${closePosThreshold}_BreakHighFirst_Prob`] || 0) * es_l + (d[`ES_HighFirst_Bot${closePosThreshold}_BreakLowFirst_Prob`] || 0) * es_h) / es_tot) : 0;
+      }
+    } else if (target === 'compare_both') {
+      nq = nq_high;
+      es = es_high;
+      nq_tot = closePosThreshold === 'none' ? nq_all : ((d[`NQ_Top${closePosThreshold}_Total`] || 0) + (d[`NQ_Bot${closePosThreshold}_Total`] || 0));
+      es_tot = closePosThreshold === 'none' ? es_all : ((d[`ES_Top${closePosThreshold}_Total`] || 0) + (d[`ES_Bot${closePosThreshold}_Total`] || 0));
+    }
+    
+    let avg = (nq > 0 && es > 0) ? (nq + es) / 2 : (nq || es || 0);
+    let delta = (nq > 0 && es > 0) ? (nq - es) : 0;
+    
+    const avg_high = ((nq_high + es_high) / 2) || 0;
+    const avg_low = ((nq_low + es_low) / 2) || 0;
+    const avg_lf = ((nq_lf_edge + es_lf_edge) / 2) || 0;
+    const avg_hf = ((nq_hf_edge + es_hf_edge) / 2) || 0;
+    
+    let primary_high = globalAsset === 'nq' ? nq_high : (globalAsset === 'es' ? es_high : avg_high);
+    let primary_low = globalAsset === 'nq' ? nq_low : (globalAsset === 'es' ? es_low : avg_low);
+    let primary_lf = globalAsset === 'nq' ? nq_lf_edge : (globalAsset === 'es' ? es_lf_edge : avg_lf);
+    let primary_hf = globalAsset === 'nq' ? nq_hf_edge : (globalAsset === 'es' ? es_hf_edge : avg_hf);
+    let skew = Math.abs(primary_high - primary_low);
+
+    return {
+      origIdx: origIdx,
+      Window: d.Window,
+      nq: +nq.toFixed(1),
+      es: +es.toFixed(1),
+      avg: +avg.toFixed(1),
+      delta: +delta.toFixed(1),
+      nq_high: +nq_high.toFixed(1),
+      nq_low: +nq_low.toFixed(1),
+      es_high: +es_high.toFixed(1),
+      es_low: +es_low.toFixed(1),
+      avg_high: +avg_high.toFixed(1),
+      avg_low: +avg_low.toFixed(1),
+      primary_high: +primary_high.toFixed(1),
+      primary_low: +primary_low.toFixed(1),
+      primary_lf: +primary_lf.toFixed(1),
+      primary_hf: +primary_hf.toFixed(1),
+      skew: +skew.toFixed(1),
+      nq_tot: nq_tot,
+      es_tot: es_tot,
+      tot: nq_tot + es_tot
+    };
+  });
+
+  // Handle Quick-Sort or Table Column Sorting
   if (hlFirstSortDir !== 0) {
     mappedData.sort((a, b) => {
       let vA = a[hlFirstSortCol], vB = b[hlFirstSortCol];
       if (hlFirstSortCol === 'Window') return vA.localeCompare(vB) * hlFirstSortDir;
       return (vA - vB) * hlFirstSortDir;
     });
+  } else if (qSort === 'high_desc') {
+    mappedData.sort((a, b) => b.primary_high - a.primary_high);
+  } else if (qSort === 'low_desc') {
+    mappedData.sort((a, b) => b.primary_low - a.primary_low);
+  } else if (qSort === 'low_first_edge') {
+    mappedData.sort((a, b) => b.primary_lf - a.primary_lf);
+  } else if (qSort === 'high_first_edge') {
+    mappedData.sort((a, b) => b.primary_hf - a.primary_hf);
+  } else if (qSort === 'skew_desc') {
+    mappedData.sort((a, b) => b.skew - a.skew);
+  } else if (qSort === 'count_desc') {
+    const getSamples = d => globalAsset === 'nq' ? d.nq_tot : (globalAsset === 'es' ? d.es_tot : d.tot);
+    mappedData.sort((a, b) => getSamples(b) - getSamples(a));
+  } else {
+    mappedData.sort((a, b) => a.origIdx - b.origIdx);
   }
 
-  const labels = mappedData.map(d=>d.Window);
-  const nqVals = mappedData.map(d=>d.nq);
-  const esVals = mappedData.map(d=>d.es);
-  
+  const labels = mappedData.map(d => d.Window);
   const series = [];
-  if (globalAsset === 'both' || globalAsset === 'nq') series.push({ name: 'NQ', type: 'line', data: nqVals, smooth: 0.3, symbolSize: 6, lineStyle: { width: 3, color: '#6366f1' }, itemStyle: { color: '#6366f1' } });
-  if (globalAsset === 'both' || globalAsset === 'es') series.push({ name: 'ES', type: 'line', data: esVals, smooth: 0.3, symbolSize: 6, lineStyle: { width: 3, color: '#38bdf8' }, itemStyle: { color: '#38bdf8' } });
+  
+  if (isCompare) {
+    const highVals = mappedData.map(d => globalAsset === 'nq' ? d.nq_high : (globalAsset === 'es' ? d.es_high : d.avg_high));
+    const lowVals = mappedData.map(d => globalAsset === 'nq' ? d.nq_low : (globalAsset === 'es' ? d.es_low : d.avg_low));
+    
+    series.push({
+      name: 'Break High 1st',
+      type: 'line',
+      data: highVals,
+      smooth: 0.3,
+      symbolSize: 6,
+      lineStyle: { width: 3, color: '#10b981' },
+      itemStyle: { color: '#10b981' }
+    });
+    series.push({
+      name: 'Break Low 1st',
+      type: 'line',
+      data: lowVals,
+      smooth: 0.3,
+      symbolSize: 6,
+      lineStyle: { width: 3, color: '#ef4444' },
+      itemStyle: { color: '#ef4444' }
+    });
+  } else {
+    const nqVals = mappedData.map(d => d.nq);
+    const esVals = mappedData.map(d => d.es);
+    
+    if (globalAsset === 'both' || globalAsset === 'nq') {
+      series.push({
+        name: 'NQ',
+        type: 'line',
+        data: nqVals,
+        smooth: 0.3,
+        symbolSize: 6,
+        lineStyle: { width: 3, color: '#6366f1' },
+        itemStyle: { color: '#6366f1' }
+      });
+    }
+    if (globalAsset === 'both' || globalAsset === 'es') {
+      series.push({
+        name: 'ES',
+        type: 'line',
+        data: esVals,
+        smooth: 0.3,
+        symbolSize: 6,
+        lineStyle: { width: 3, color: '#38bdf8' },
+        itemStyle: { color: '#38bdf8' }
+      });
+    }
+  }
 
   ec('chartHlFirst').setOption({
-    tooltip: { ...TT, trigger: 'axis' }, legend: { top: 0, right: 0, textStyle: { color: '#a1a1aa' }, icon: 'circle' },
-    grid: { top: 30, right: 10, bottom: 70, left: 35 }, dataZoom: [{ type: 'inside' }],
+    tooltip: { ...TT, trigger: 'axis' },
+    legend: { top: 0, right: 0, textStyle: { color: '#a1a1aa' }, icon: 'circle' },
+    grid: { top: 30, right: 10, bottom: 70, left: 35 },
+    dataZoom: [{ type: 'inside' }],
     xAxis: { ...AXIS_STYLE, type: 'category', data: labels, axisLabel: { ...AXIS_STYLE.axisLabel, rotate: 45 } },
     yAxis: { ...AXIS_STYLE, type: 'value', min: 0, max: 100 },
     series: series
-  }, {replaceMerge: ["series"]});
-  
+  }, { replaceMerge: ["series"] });
+
   const showNq = globalAsset === 'both' || globalAsset === 'nq';
   const showEs = globalAsset === 'both' || globalAsset === 'es';
   const showAvg = globalAsset === 'both';
   
   function thHtml(colId, label, cls) {
     const isAct = hlFirstSortCol === colId && hlFirstSortDir !== 0 ? 'color:var(--text-1); background:var(--bg-hover); border-bottom: 2px solid var(--accent);' : 'cursor:pointer;';
-    let sortInd = ''; if (hlFirstSortCol === colId && hlFirstSortDir !== 0) { sortInd = hlFirstSortDir === -1 ? ' ↓' : ' ↑'; }
+    let sortInd = '';
+    if (hlFirstSortCol === colId && hlFirstSortDir !== 0) {
+      sortInd = hlFirstSortDir === -1 ? ' ↓' : ' ↑';
+    }
     return `<th class="${cls} hlfirst-sort-btn" data-c="${colId}" style="${isAct}">${label}${sortInd}</th>`;
   }
   
-  let th = '<tr>' + thHtml('Window', 'Window', '');
-  if (showNq) {
-      th += thHtml('nq', 'Opp Break NQ %', 'r');
-      th += thHtml('nq_cond', 'Cond Opp Break NQ %', 'r');
+  let tblHeadHtml = '<tr>' + thHtml('Window', 'Window', '');
+  if (isCompare) {
+    if (showNq) {
+      tblHeadHtml += thHtml('nq_high', 'NQ High %', 'r') + thHtml('nq_low', 'NQ Low %', 'r');
+    }
+    if (showEs) {
+      tblHeadHtml += thHtml('es_high', 'ES High %', 'r') + thHtml('es_low', 'ES Low %', 'r');
+    }
+    if (showAvg) {
+      tblHeadHtml += thHtml('avg_high', 'Avg High %', 'r') + thHtml('avg_low', 'Avg Low %', 'r');
+    }
+    tblHeadHtml += thHtml('tot', 'Samples', 'r');
+  } else {
+    if (showNq) {
+      tblHeadHtml += thHtml('nq', 'NQ Prob %', 'r') + thHtml('nq_tot', 'NQ Samples', 'r');
+    }
+    if (showEs) {
+      tblHeadHtml += thHtml('es', 'ES Prob %', 'r') + thHtml('es_tot', 'ES Samples', 'r');
+    }
+    if (showAvg) {
+      tblHeadHtml += thHtml('avg', 'Avg %', 'r') + thHtml('delta', 'Δ (NQ-ES)', 'r');
+    }
   }
-  if (showEs) {
-      th += thHtml('es', 'Opp Break ES %', 'r');
-      th += thHtml('es_cond', 'Cond Opp Break ES %', 'r');
-  }
-  if (showAvg) { th += thHtml('avg', 'Avg', 'r') + thHtml('cond_avg', 'Cond Avg', 'r') + thHtml('delta', 'Δ', 'r'); }
-  th += '</tr>';
-  $('tblHlFirst').previousElementSibling.innerHTML = th;
+  tblHeadHtml += '</tr>';
+  
+  const theadEl = $('tblHlFirst').previousElementSibling;
+  if (theadEl) theadEl.innerHTML = tblHeadHtml;
   
   $$('.hlfirst-sort-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const c = btn.dataset.c;
       if (hlFirstSortCol === c) {
-        if (hlFirstSortDir === -1) hlFirstSortDir = 1; else if (hlFirstSortDir === 1) hlFirstSortDir = 0; else hlFirstSortDir = -1;
-      } else { hlFirstSortCol = c; hlFirstSortDir = -1; }
+        if (hlFirstSortDir === -1) hlFirstSortDir = 1;
+        else if (hlFirstSortDir === 1) hlFirstSortDir = 0;
+        else hlFirstSortDir = -1;
+      } else {
+        hlFirstSortCol = c;
+        hlFirstSortDir = -1;
+      }
       updateHlFirst();
     });
   });
   
   let h = '';
   mappedData.forEach(d => {
-    const avg = d.avg; const delta = d.delta; const dc = delta > 0 ? 'c-dn' : 'c-up'; const bg = avg > 75 ? 'hl' : '';
+    const avg = d.avg;
+    const delta = d.delta;
+    const dc = delta > 0 ? 'c-dn' : delta < 0 ? 'c-up' : '';
+    const bg = avg > 75 ? 'hl' : '';
     
     h += `<tr class="${bg}"><td class="c-mono">${d.Window}</td>`;
-    if (showNq) {
-        h += `<td class="r c-mono">${d.nq.toFixed(1)}</td>`;
-        h += `<td class="r c-mono" style="color:var(--accent)">${d.nq_cond.toFixed(1)}</td>`;
+    if (isCompare) {
+      if (showNq) {
+        h += `<td class="r c-mono" style="color:#10b981;">${d.nq_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.nq_low.toFixed(1)}%</td>`;
+      }
+      if (showEs) {
+        h += `<td class="r c-mono" style="color:#10b981;">${d.es_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.es_low.toFixed(1)}%</td>`;
+      }
+      if (showAvg) {
+        h += `<td class="r c-mono" style="color:#10b981;">${d.avg_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.avg_low.toFixed(1)}%</td>`;
+      }
+      h += `<td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.tot}</td>`;
+    } else {
+      if (showNq) {
+        h += `<td class="r c-mono">${d.nq.toFixed(1)}%</td><td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.nq_tot}</td>`;
+      }
+      if (showEs) {
+        h += `<td class="r c-mono">${d.es.toFixed(1)}%</td><td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.es_tot}</td>`;
+      }
+      if (showAvg) {
+        h += `<td class="r c-mono">${avg.toFixed(1)}%</td><td class="r c-mono ${dc}">${delta > 0 ? '+' : ''}${delta.toFixed(1)}%</td>`;
+      }
     }
-    if (showEs) {
-        h += `<td class="r c-mono">${d.es.toFixed(1)}</td>`;
-        h += `<td class="r c-mono" style="color:var(--accent)">${d.es_cond.toFixed(1)}</td>`;
-    }
-    if (showAvg) h += `<td class="r c-mono">${avg.toFixed(1)}</td><td class="r c-mono" style="color:var(--accent)">${d.cond_avg.toFixed(1)}</td><td class="r c-mono ${dc}">${delta>0?'+':''}${delta.toFixed(1)}</td>`;
     h += `</tr>`;
   });
   $('tblHlFirst').innerHTML = h;
 }
-initSeg('segHlFirstDir', updateHlFirst); updateHlFirst();
+
+initSeg('segHlTarget', updateHlFirst);
+initSeg('segClosePosTh', updateHlFirst);
+initSeg('segHlSort', () => {
+  hlFirstSortDir = 0;
+  updateHlFirst();
+});
+updateHlFirst();
 
 let extWin = 0, extPct = '50%', extSortDir = 0;
 function extData(asset) { return EXT[asset]?.[segVal('segBreak')]?.[segVal('segDir')] || [] }

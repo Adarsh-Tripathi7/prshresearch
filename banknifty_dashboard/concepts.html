@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Prsh Capital | Concepts & Methodology</title>
+<meta name="description" content="Methodology and quantitative concepts used in the Prsh Capital Dashboard.">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=3">
+<link rel="icon" type="image/svg+xml" href="icon.svg?v=3">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-dark: #09090b;
+        --bg-card: rgba(24, 24, 27, 0.6);
+        --border-light: rgba(255,255,255,0.08);
+        --text-main: #fdfbf7;
+        --text-muted: #94a3b8;
+        --accent: #818cf8;
+        --accent-glow: rgba(129, 140, 248, 0.15);
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        line-height: 1.6;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+    }
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(9, 9, 11, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-light);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+    }
+    .back-btn {
+        color: var(--text-muted);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .back-btn:hover {
+        color: var(--text-main);
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    h1 {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+        color: #fff;
+    }
+    .subtitle {
+        color: var(--text-muted);
+        font-size: 16px;
+        margin-bottom: 40px;
+    }
+    .concept-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-light);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .concept-card h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .concept-card p {
+        color: var(--text-muted);
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+    .concept-card p:last-child {
+        margin-bottom: 0;
+    }
+    .highlight {
+        color: var(--accent);
+        font-weight: 600;
+    }
+    .indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .ind-blue { background: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+    .ind-green { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+    .ind-purple { background: #8b5cf6; box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+</style>
+<script>
+(function(){
+    var theme = localStorage.getItem("theme");
+    if(theme === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+    }
+})();
+</script>
+</head>
+<body>
+
+<div class="header">
+    <a href="index.html" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Hub
+    </a>
+</div>
+
+<div class="container">
+    <h1>Concepts & Methodology</h1>
+    <div class="subtitle">A guide to interpreting the quantitative models in the Prsh Capital Dashboard.</div>
+
+    <div class="concept-card">
+        <h2>The Initial Balance (IB)</h2>
+        <p>In auction market theory, the <span class="highlight">Initial Balance</span> represents the high and low price range established during the first period of trading after the market opens.</p>
+        <p>This period is critical because it represents the time when institutional orders are executed and price discovery occurs. Once the IB is set, traders monitor whether the market stays inside this range (a balanced, consolidating market) or breaks out of it (a trending market).</p>
+    </div>
+
+    <div class="concept-card">
+        <h2><span class="indicator ind-blue"></span> Probability Model</h2>
+        <p>The blue heatmap represents the <strong>Baseline Probability</strong> of the market extending beyond the Initial Balance.</p>
+        <p>When the market breaks the IB high or low, we measure how far it travels as a multiple of the IB's size (e.g., 1.5x, 2.0x, 3.0x). The blue heatmap tells you, based on historical backtesting, the exact statistical probability that the market will reach a specific extension target on any given day.</p>
+    </div>
+
+    <div class="concept-card">
+        <h2><span class="indicator ind-green"></span> Extension Matrix</h2>
+        <p>The green/red heatmap represents <strong>Conditional Probability</strong>. It answers the question: <em>"If the market has already hit Target A, what is the probability it will continue to Target B?"</em></p>
+        <p>For example, if the 1.5x extension has already been breached, the matrix shows the likelihood of price continuing to the 2.0x or 3.0x extensions. This allows you to dynamically trail stops and manage risk based on real-time market momentum rather than static guesses.</p>
+    </div>
+
+    <div class="concept-card">
+        <h2><span class="indicator ind-purple"></span> Leader/Lagger Correlation</h2>
+        <p>The violet heatmap displays the <strong>Cross-Asset Correlation</strong> between two highly correlated indices (e.g., NQ and ES).</p>
+        <p>If NQ (Nasdaq) is aggressively breaking its 2.0x extension, what is the probability that ES (S&P 500) will follow suit and hit its own targets? This heatmap helps identify divergence. If one index is leading the charge while the other lags behind, it can signal either an impending catch-up move (arbitrage opportunity) or a false breakout.</p>
+    </div>
+
+    <div class="concept-card">
+        <h2>Time Frames & Steps</h2>
+        <p>The dashboard provides data across various time frames (e.g., 15m, 30m, 60m). These represent the <strong>duration</strong> used to calculate the Initial Balance.</p>
+        <p>A <span class="highlight">15m IB</span> is established very quickly and is highly sensitive, often resulting in multiple early breakouts. A <span class="highlight">60m IB</span> takes a full hour to form, creating a much stronger and more significant support/resistance boundary.</p>
+        <p>Dashboards labeled <strong>"Step"</strong> represent rolling or staggered calculations, providing a more granular look at price action as it transitions between major time intervals.</p>
+    </div>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var toggleBtn = document.getElementById("themeToggleBtn");
+    if(toggleBtn) {
+        toggleBtn.addEventListener("click", function() {
+            var isLight = document.documentElement.getAttribute("data-theme") === "light";
+            if(isLight) {
+                document.documentElement.removeAttribute("data-theme");
+                localStorage.setItem("theme", "dark");
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                localStorage.setItem("theme", "light");
+            }
+            if(window.echarts) {
+                location.reload();
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>

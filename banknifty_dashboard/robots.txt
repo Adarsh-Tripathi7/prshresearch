@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://prshcapital.netlify.app/sitemap.xml

@@ -1,5 +1,7 @@
 import re
 import os
+import json
+import csv
 
 FILES = [
     r"d:\Antigravity\Dashboard\ib_interactive_dashboard_7m_1m_step.html",
@@ -48,8 +50,6 @@ TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 
-
-
 <header class="app-bar">
   <div style="display:flex; align-items:center;">
     <a href="index.html" class="brand" aria-label="Go to Home" style="margin-right:0;">
@@ -77,8 +77,6 @@ TEMPLATE = """<!DOCTYPE html>
     <input type="text" id="search" placeholder="Search window (e.g. 09:30)...">
   </div>
 </header>
-
-
 
 <div id="spotlight"><div class="spot-head"><div class="spot-title" id="spotTitle"></div><button class="spot-close" id="spotClose">&times;</button></div><div class="spot-grid" id="spotGrid"></div></div>
 
@@ -122,11 +120,32 @@ TEMPLATE = """<!DOCTYPE html>
     <div class="grid">
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><div class="dot" style="background:var(--accent)"></div> High First / Low First Double Break %</div>
-          <div class="segments-scroll"><div class="segments" id="segHlFirstDir">
-            <button class="active" data-v="high_first">High First</button>
-            <button data-v="low_first">Low First</button>
-            <button data-v="combined">Combined</button>
+          <div class="card-title"><div class="dot" style="background:var(--accent)"></div> High / Low Sequence & Close Position Explorer</div>
+          <div class="segments-scroll"><div class="segments" id="segHlTarget">
+            <button class="active" data-v="break_high_first">Break High 1st</button>
+            <button data-v="break_low_first">Break Low 1st</button>
+            <button data-v="low_first_break_high">Low 1st → Break High</button>
+            <button data-v="high_first_break_low">High 1st → Break Low</button>
+            <button data-v="combined_opp">Combined Opposite</button>
+            <button data-v="compare_both">Compare High vs Low</button>
+          </div></div>
+          <div class="segments-scroll"><div class="segments" id="segClosePosTh">
+            <button class="active" data-v="none">All Closes</button>
+            <button data-v="25%">Top/Bot 25%</button>
+            <button data-v="30%">Top/Bot 30%</button>
+            <button data-v="35%">Top/Bot 35%</button>
+            <button data-v="40%">Top/Bot 40%</button>
+            <button data-v="45%">Top/Bot 45%</button>
+            <button data-v="50%">Top/Bot 50%</button>
+          </div></div>
+          <div class="segments-scroll"><div class="segments" id="segHlSort">
+            <button class="active" data-v="time">Time</button>
+            <button data-v="high_desc">High Break % ↓</button>
+            <button data-v="low_desc">Low Break % ↓</button>
+            <button data-v="low_first_edge">Low 1st Edge ↓</button>
+            <button data-v="high_first_edge">High 1st Edge ↓</button>
+            <button data-v="skew_desc">Direction Skew ↓</button>
+            <button data-v="count_desc">Samples ↓</button>
           </div></div>
         </div>
         <div class="card-body"><div id="chartHlFirst" class="echart" style="height:400px"></div></div>
@@ -225,15 +244,12 @@ TEMPLATE = """<!DOCTYPE html>
 </nav>
 
 <script>
-const _D = DATA_PLACEHOLDER;
+window._D = DATA_PLACEHOLDER;
 </script>
 <script src="main.js"></script>
 </body>
 </html>
 """
-
-import json
-import csv
 
 def format_title(name):
     parts = name.split('_')
@@ -341,14 +357,42 @@ for source_file in FILES:
         else:
             print(f"Warning: CSV not found for {csv_name}")
             
+    # Read ClosePositionAnalysis CSV and inject close_pos
+    cp_csv_path = os.path.join(r"d:\Antigravity\Results\ClosePositionAnalysis", f"{name_parts}_by_window.csv")
+    if os.path.exists(cp_csv_path):
+        close_pos_rows = []
+        with open(cp_csv_path, "r", encoding="utf-8") as cpf:
+            cp_reader = csv.DictReader(cpf)
+            for row in cp_reader:
+                converted_row = {}
+                for k, v in row.items():
+                    if k == 'Window':
+                        converted_row[k] = v
+                    else:
+                        try:
+                            converted_row[k] = float(v) if '.' in v else int(v)
+                        except (ValueError, TypeError):
+                            converted_row[k] = v
+                close_pos_rows.append(converted_row)
+        data_obj["close_pos"] = close_pos_rows
+        print(f"Injected {len(close_pos_rows)} close_pos rows for {name_parts}")
+    else:
+        print(f"Warning: ClosePositionAnalysis CSV not found for {name_parts}")
+
     # Serialize back to JSON string
     updated_json_str = json.dumps(data_obj)
     
+    # Save standalone data JSON in data/ folder
+    json_data_path = os.path.join(OUT_DIR, "data", f"time_range_{name_parts}.json")
+    if os.path.exists(os.path.dirname(json_data_path)):
+        with open(json_data_path, "w", encoding="utf-8") as jf:
+            json.dump(data_obj, jf)
+            
     # Generate HTML
     final_html = TEMPLATE.replace("DATA_PLACEHOLDER", updated_json_str).replace("TITLE_PLACEHOLDER", clean_title)
     
     target_file = os.path.join(OUT_DIR, new_basename)
     with open(target_file, "w", encoding="utf-8") as f:
         f.write(final_html)
-        
-print("Updated badge titles, injected JSON data, and reverted decoupling for file:/// protocol support!")
+
+print("Updated all mobile dashboards with close_pos data and restored exact original layout!")
