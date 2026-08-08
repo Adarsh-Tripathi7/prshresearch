@@ -1345,13 +1345,20 @@ body.ph-done::before {
   box-shadow: 0 0 8px var(--done-glow);
 }
 
-/* Keyboard hint footer */
+/* Keyboard hint footer (Only displayed on desktop devices with physical keyboard and fine pointer) */
 .keyboard-bar {
+  display: none;
   text-align: center;
   font-size: 0.7rem;
   color: var(--text-3);
   margin-top: 18px;
   padding-bottom: 8px;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 769px) {
+  .keyboard-bar {
+    display: block;
+  }
 }
 kbd {
   background: var(--bg-surface);
