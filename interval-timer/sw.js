@@ -1,4 +1,4 @@
-const CACHE_NAME = 'forge-pro-v1';
+const CACHE_NAME = 'forge-pro-v1.3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -19,13 +19,14 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. Activate & Clean Old Caches
+// 2. Activate & Clean Old Caches Immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Purging legacy cache:', key);
             return caches.delete(key);
           }
         })
@@ -34,45 +35,34 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Cache-First with Network Fallback (100% Offline Capable)
+// 3. Listen for Update Skip-Waiting Messages from App UI
+self.addEventListener('message', (event) => {
+  if (event.data && (event.data.type === 'SKIP_WAITING' || event.data === 'SKIP_WAITING')) {
+    self.skipWaiting();
+  }
+});
+
+// 4. Cache-First with Background Network Revalidation
 self.addEventListener('fetch', (event) => {
-  // Ignore non-GET requests
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Return cached version immediately
-        // Fetch in background to update cache for next time
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
-            });
-          }
-        }).catch(() => {/* Offline */});
-
-        return cachedResponse;
-      }
-
-      // If not in cache, fetch from network and cache it
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
         }
-
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
         return networkResponse;
       }).catch(() => {
-        // Fallback for HTML documents
         if (event.request.headers.get('accept')?.includes('text/html')) {
           return caches.match('./index.html');
         }
       });
+
+      return cachedResponse || fetchPromise;
     })
   );
 });

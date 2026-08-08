@@ -1243,8 +1243,46 @@ kbd {
   pointer-events: none;
   transition: transform 0.4s var(--ease-spring);
 }
-.toast-msg.show {
+/* ══════════════════════════════════════════════════════════════════
+   IN-APP UPDATE AVAILABLE BANNER (INSTANT MOBILE UPDATES)
+══════════════════════════════════════════════════════════════════ */
+.update-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-140px);
+  width: calc(100% - 32px);
+  max-width: 440px;
+  background: var(--bg-deck);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--work-primary);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.65), 0 0 24px var(--work-ambient);
+  z-index: 1000;
+  transition: transform 0.4s var(--ease-spring);
+}
+.update-banner.show {
   transform: translateX(-50%) translateY(0);
+}
+.btn-update-cta {
+  background: var(--work-primary);
+  color: var(--badge-text);
+  padding: 7px 14px;
+  border-radius: var(--r-xs);
+  font-size: 0.76rem;
+  font-weight: 800;
+  box-shadow: 0 2px 8px var(--work-glow);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-update-cta:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1351,6 +1389,20 @@ kbd {
 <body>
 
 <div class="toast-msg" id="toastMsg">Session Complete — Outstanding Workout</div>
+
+<!-- IN-APP UPDATE NOTIFICATION BANNER -->
+<div class="update-banner" id="updateBanner">
+  <div class="install-prompt-icon" style="background:var(--work-ambient); border:1px solid var(--work-primary); color:var(--work-primary);">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+    </svg>
+  </div>
+  <div class="install-prompt-body">
+    <div class="install-prompt-title">New Update Ready</div>
+    <div class="install-prompt-desc">Tap to load the latest features instantly</div>
+  </div>
+  <button class="btn-update-cta" onclick="applyAppUpdate()">Update Now</button>
+</div>
 
 <!-- AUTO-DETECTED INSTALLATION PROMPT BANNER (POPS UP AUTOMATICALLY) -->
 <div class="install-prompt-banner" id="installPromptBanner">
@@ -1965,9 +2017,19 @@ function releaseWakeLock() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   PWA SERVICE WORKER & AUTOMATIC INSTALLATION DETECTION ENGINE
+   HAPTIC TACTILE VIBRATION ENGINE (MOBILE PHYSICAL FEEDBACK)
+══════════════════════════════════════════════════════════════════ */
+function triggerHaptic(pattern = [40]) {
+  if ('vibrate' in navigator) {
+    try { navigator.vibrate(pattern); } catch (e) {}
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PWA SERVICE WORKER, UPDATE ENGINE & INSTALLATION DETECTION
 ══════════════════════════════════════════════════════════════════ */
 let deferredInstallPrompt = null;
+let waitingWorker = null;
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 const isIosDevice = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
 
@@ -1975,25 +2037,78 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       console.log('FORGE PRO Service Worker active:', reg.scope);
+
+      // 1. If an updated worker is already waiting in background, prompt user
+      if (reg.waiting) {
+        waitingWorker = reg.waiting;
+        showUpdatePrompt();
+      }
+
+      // 2. Listen for new update downloads
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              waitingWorker = newWorker;
+              showUpdatePrompt();
+            }
+          });
+        }
+      });
+
+      // 3. Auto-check for updates whenever user returns to the app
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          reg.update().catch(() => {});
+        }
+      });
+
+      // 4. Periodic background update check (every 10 minutes)
+      setInterval(() => {
+        reg.update().catch(() => {});
+      }, 10 * 60 * 1000);
+
+      // Auto-detect iOS Safari install (when not already installed as standalone)
+      if (isIosDevice && !isStandalone && !sessionStorage.getItem('forge_install_dismissed')) {
+        setTimeout(() => {
+          const titleEl = document.getElementById('installPromptTitle');
+          const descEl = document.getElementById('installPromptDesc');
+          const ctaBtn = document.getElementById('btnInstallCTA');
+          if (titleEl && descEl) {
+            titleEl.textContent = 'Install FORGE PRO';
+            descEl.innerHTML = 'Tap <strong>Share</strong> ⎋ &rarr; <strong>Add to Home Screen</strong> for offline use';
+            if (ctaBtn) ctaBtn.style.display = 'none';
+            showAutoInstallPrompt();
+          }
+        }, 1800);
+      }
     }).catch((err) => {
       console.warn('SW registration failed:', err);
     });
 
-    // Auto-detect iOS Safari (when not already installed as standalone)
-    if (isIosDevice && !isStandalone && !sessionStorage.getItem('forge_install_dismissed')) {
-      setTimeout(() => {
-        const titleEl = document.getElementById('installPromptTitle');
-        const descEl = document.getElementById('installPromptDesc');
-        const ctaBtn = document.getElementById('btnInstallCTA');
-        if (titleEl && descEl) {
-          titleEl.textContent = 'Install FORGE PRO';
-          descEl.innerHTML = 'Tap <strong>Share</strong> ⎋ &rarr; <strong>Add to Home Screen</strong> for offline use';
-          if (ctaBtn) ctaBtn.style.display = 'none';
-          showAutoInstallPrompt();
-        }
-      }, 1800);
-    }
+    // Auto-reload smoothly when the new Service Worker activates
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
   });
+}
+
+function showUpdatePrompt() {
+  const banner = document.getElementById('updateBanner');
+  if (banner) banner.classList.add('show');
+}
+
+function applyAppUpdate() {
+  if (waitingWorker) {
+    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+  } else {
+    window.location.reload();
+  }
 }
 
 // Auto-detect Android / Chrome / Edge native install prompt
@@ -2271,10 +2386,12 @@ function ticker(now) {
 
     if (STATE.phase === 'countdown' && currentSec >= 1) {
       SoundEffects.tick();
+      triggerHaptic([35]);
     }
 
     if ((STATE.phase === 'work' || STATE.phase === 'rest') && currentSec <= 3 && currentSec >= 1) {
       SoundEffects.warningBeep();
+      triggerHaptic([40]);
     }
   }
 
@@ -2294,11 +2411,13 @@ function advancePhase(overflowMs = 0) {
     STATE.remainingMs = STATE.workDurationMs - overflowMs;
     STATE.lastTriggeredSec = -1;
     SoundEffects.workStart();
+    triggerHaptic([90, 40, 140]);
   } else if (STATE.phase === 'work') {
     STATE.phase = 'rest';
     STATE.remainingMs = STATE.restDurationMs - overflowMs;
     STATE.lastTriggeredSec = -1;
     SoundEffects.restStart();
+    triggerHaptic([60, 30, 60]);
   } else if (STATE.phase === 'rest') {
     if (STATE.currentRound >= STATE.totalRounds) {
       STATE.phase = 'done';
@@ -2306,6 +2425,7 @@ function advancePhase(overflowMs = 0) {
       STATE.remainingMs = 0;
       releaseWakeLock();
       SoundEffects.sessionComplete();
+      triggerHaptic([100, 50, 100, 50, 200]);
       showToast('Session Complete — Outstanding Workout');
       renderUI();
       return;
@@ -2315,6 +2435,7 @@ function advancePhase(overflowMs = 0) {
     STATE.remainingMs = STATE.workDurationMs - overflowMs;
     STATE.lastTriggeredSec = -1;
     SoundEffects.workStart();
+    triggerHaptic([90, 40, 140]);
   }
 
   renderUI();
