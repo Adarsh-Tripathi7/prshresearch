@@ -1,25 +1,26 @@
-const CACHE_NAME = 'forge-pro-v1.3';
+const CACHE_NAME = 'forge-pro-v3.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
+  './favicon.svg',
   './icon-192.svg',
-  './icon-512.svg',
-  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap'
+  './icon-512.svg'
 ];
 
-// 1. Install & Pre-cache
+// 1. Install & Immediately Skip Waiting
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
-        console.warn('Some remote assets could not be cached immediately:', err);
+        console.warn('Pre-cache warning:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// 2. Activate & Clean Old Caches Immediately
+// 2. Activate & Immediately Claim Clients & Purge Legacy Caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -35,32 +36,46 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Listen for Update Skip-Waiting Messages from App UI
+// 3. Listen for Update Messages from UI
 self.addEventListener('message', (event) => {
   if (event.data && (event.data.type === 'SKIP_WAITING' || event.data === 'SKIP_WAITING')) {
     self.skipWaiting();
   }
 });
 
-// 4. Cache-First with Background Network Revalidation
+// 4. Fetch Strategy: Network-First for HTML/Navigation, Cache-First for static assets
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+  const url = new URL(event.request.url);
+
+  // For HTML documents / root path: ALWAYS try network first so mobile updates show instantly!
+  if (event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html') || url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const resClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
         }
         return networkResponse;
       }).catch(() => {
-        if (event.request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('./index.html');
+        // Fallback to cache when offline
+        return caches.match(event.request).then((cached) => cached || caches.match('./index.html'));
+      })
+    );
+    return;
+  }
+
+  // For other static assets (images, fonts, manifest): Stale-While-Revalidate
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const resClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
         }
-      });
+        return networkResponse;
+      }).catch(() => cachedResponse);
 
       return cachedResponse || fetchPromise;
     })

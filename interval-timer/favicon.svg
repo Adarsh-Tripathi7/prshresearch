@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="favTitanium" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#E2E8F0"/>
+      <stop offset="100%" stop-color="#94A3B8"/>
+    </linearGradient>
+  </defs>
+  <!-- Dark Bezel Background -->
+  <rect width="32" height="32" rx="7" fill="#0A0B0E"/>
+  <rect x="1" y="1" width="30" height="30" rx="6" fill="none" stroke="url(#favTitanium)" stroke-width="1.2" opacity="0.6"/>
+  <!-- Crisp Solid High-Contrast Lightning Emblem -->
+  <path d="M17 4L8 16H15L13 28L24 14H16L17 4Z" fill="url(#favTitanium)"/>
+</svg>
