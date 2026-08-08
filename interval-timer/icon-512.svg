@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#000000"/>
+  <defs>
+    <linearGradient id="forgeGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5A26"/>
+      <stop offset="50%" stop-color="#FF2A00"/>
+      <stop offset="100%" stop-color="#FF8F50"/>
+    </linearGradient>
+    <filter id="shadow512" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#FF5A26" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <rect x="64" y="64" width="384" height="384" rx="96" fill="url(#forgeGrad512)" filter="url(#shadow512)"/>
+  <!-- Vector Shield & Lightning Bolt -->
+  <path d="M256 124L144 180V314L256 380L368 314V180L256 124Z" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" fill="none" opacity="0.95"/>
+  <path d="M256 172L192 258H262L240 338L320 248H250L256 172Z" fill="#FFD166" opacity="0.98"/>
+</svg>

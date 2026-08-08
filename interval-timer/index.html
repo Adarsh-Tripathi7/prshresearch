@@ -1,0 +1,2952 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="jet-black">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>FORGE PRO — High Performance Interval Trainer</title>
+  <meta name="description" content="FORGE PRO — Elite interval timer with luxury chronograph dial, OLED Jet Black and Peach White themes, and studio-grade acoustic cues."/>
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#000000"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="FORGE PRO"/>
+  <link rel="apple-touch-icon" href="icon-192.svg"/>
+  <link rel="icon" type="image/svg+xml" href="icon-192.svg"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  
+  <style>
+/* ══════════════════════════════════════════════════════════════════
+   RESET & SYSTEM DESIGN TOKENS
+══════════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; height: 100%; -webkit-tap-highlight-color: transparent; }
+button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; }
+input { font-family: inherit; }
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --ring-size: clamp(280px, 46vw, 390px);
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-full: 9999px;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── 1. JET BLACK (TRUE OLED #000000) ── */
+html[data-theme="jet-black"] {
+  --bg-page: #000000;
+  --bg-surface: rgba(255, 255, 255, 0.05);
+  --bg-surface-hover: rgba(255, 255, 255, 0.09);
+  --bg-surface-active: rgba(255, 255, 255, 0.14);
+  --bg-deck: rgba(14, 14, 16, 0.85);
+  --bg-inset: rgba(255, 255, 255, 0.03);
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-focus: rgba(255, 90, 38, 0.55);
+  
+  --text-1: #FFFFFF;
+  --text-2: rgba(255, 255, 255, 0.68);
+  --text-3: rgba(255, 255, 255, 0.38);
+  
+  --work-primary: #FF5A26;
+  --work-secondary: #FF8F50;
+  --work-glow: rgba(255, 90, 38, 0.45);
+  --work-ambient: rgba(255, 90, 38, 0.12);
+  --btn-text-work: #FFFFFF;
+  --badge-text: #FFFFFF;
+  
+  --rest-primary: #38BDF8;
+  --rest-secondary: #7DD3FC;
+  --rest-glow: rgba(56, 189, 248, 0.45);
+  --rest-ambient: rgba(56, 189, 248, 0.12);
+  --btn-text-rest: #FFFFFF;
+  
+  --done-primary: #34D399;
+  --done-glow: rgba(52, 211, 153, 0.45);
+  
+  --brand-mark-bg: linear-gradient(135deg, #FF5A26 0%, #FF2A00 50%, #FF8F50 100%);
+  --brand-bolt-color: #FFD166;
+  
+  --ring-track: rgba(255, 255, 255, 0.05);
+  --ring-tick: rgba(255, 255, 255, 0.12);
+  --shadow-deck: 0 24px 48px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
+  --shadow-btn: 0 10px 30px rgba(255, 90, 38, 0.45), 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* ── 2. PEACH WHITE (LUXURY PORCELAIN CREAM) ── */
+html[data-theme="peach-white"] {
+  --bg-page: #FAF4EF;
+  --bg-surface: rgba(255, 255, 255, 0.9);
+  --bg-surface-hover: #FFFFFF;
+  --bg-surface-active: #F2E8DF;
+  --bg-deck: rgba(255, 255, 255, 0.88);
+  --bg-inset: rgba(235, 218, 206, 0.45);
+  
+  --border-subtle: rgba(210, 185, 170, 0.35);
+  --border-strong: rgba(190, 160, 145, 0.55);
+  --border-focus: rgba(255, 90, 50, 0.6);
+  
+  --text-1: #1E1B24;
+  --text-2: #655E6F;
+  --text-3: #9E96A6;
+  
+  --work-primary: #FF5533;
+  --work-secondary: #FF7E5F;
+  --work-glow: rgba(255, 85, 51, 0.35);
+  --work-ambient: rgba(255, 126, 95, 0.16);
+  --btn-text-work: #FFFFFF;
+  --badge-text: #FFFFFF;
+  
+  --rest-primary: #0284C7;
+  --rest-secondary: #38BDF8;
+  --rest-glow: rgba(2, 132, 199, 0.35);
+  --rest-ambient: rgba(56, 189, 248, 0.14);
+  --btn-text-rest: #FFFFFF;
+  
+  --done-primary: #059669;
+  --done-glow: rgba(5, 150, 105, 0.35);
+  
+  --brand-mark-bg: linear-gradient(135deg, #FF5533 0%, #E03E1A 50%, #FF7E5F 100%);
+  --brand-bolt-color: #FFF3E6;
+  
+  --ring-track: rgba(210, 185, 170, 0.3);
+  --ring-tick: rgba(190, 160, 145, 0.35);
+  --shadow-deck: 0 20px 48px rgba(180, 140, 120, 0.14), 0 0 0 1px var(--border-subtle);
+  --shadow-btn: 0 12px 32px rgba(255, 85, 51, 0.38), 0 4px 10px rgba(180, 120, 100, 0.2);
+}
+
+/* ── 3. CYBER NEON MATRIX ── */
+html[data-theme="cyber-neon"] {
+  --bg-page: #000000;
+  --bg-surface: rgba(16, 185, 129, 0.05);
+  --bg-surface-hover: rgba(16, 185, 129, 0.09);
+  --bg-surface-active: rgba(16, 185, 129, 0.14);
+  --bg-deck: rgba(8, 18, 12, 0.85);
+  --bg-inset: rgba(16, 185, 129, 0.03);
+  
+  --border-subtle: rgba(16, 185, 129, 0.15);
+  --border-strong: rgba(16, 185, 129, 0.3);
+  --border-focus: #10B981;
+  
+  --text-1: #ECFDF5;
+  --text-2: rgba(209, 250, 229, 0.68);
+  --text-3: rgba(167, 243, 208, 0.38);
+  
+  --work-primary: #10B981;
+  --work-secondary: #34D399;
+  --work-glow: rgba(16, 185, 129, 0.55);
+  --work-ambient: rgba(16, 185, 129, 0.14);
+  --btn-text-work: #000000;
+  --badge-text: #000000;
+  
+  --rest-primary: #06B6D4;
+  --rest-secondary: #22D3EE;
+  --rest-glow: rgba(6, 182, 212, 0.55);
+  --rest-ambient: rgba(6, 182, 212, 0.14);
+  --btn-text-rest: #000000;
+  
+  --done-primary: #EAB308;
+  --done-glow: rgba(234, 179, 8, 0.55);
+  
+  --brand-mark-bg: linear-gradient(135deg, #10B981 0%, #059669 50%, #34D399 100%);
+  --brand-bolt-color: #022C22;
+  
+  --ring-track: rgba(255, 255, 255, 0.05);
+  --ring-tick: rgba(16, 185, 129, 0.25);
+  --shadow-deck: 0 24px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--border-subtle);
+  --shadow-btn: 0 10px 30px rgba(16, 185, 129, 0.45), 0 4px 12px rgba(0,0,0,0.6);
+}
+
+/* ── 4. NEBULA VIOLET ── */
+html[data-theme="nebula-violet"] {
+  --bg-page: #000000;
+  --bg-surface: rgba(168, 85, 247, 0.05);
+  --bg-surface-hover: rgba(168, 85, 247, 0.09);
+  --bg-surface-active: rgba(168, 85, 247, 0.14);
+  --bg-deck: rgba(16, 8, 24, 0.85);
+  --bg-inset: rgba(168, 85, 247, 0.03);
+  
+  --border-subtle: rgba(168, 85, 247, 0.15);
+  --border-strong: rgba(168, 85, 247, 0.3);
+  --border-focus: #A855F7;
+  
+  --text-1: #FAF5FF;
+  --text-2: rgba(243, 232, 255, 0.68);
+  --text-3: rgba(216, 180, 254, 0.38);
+  
+  --work-primary: #A855F7;
+  --work-secondary: #C084FC;
+  --work-glow: rgba(168, 85, 247, 0.55);
+  --work-ambient: rgba(168, 85, 247, 0.15);
+  --btn-text-work: #FFFFFF;
+  --badge-text: #FFFFFF;
+  
+  --rest-primary: #F43F5E;
+  --rest-secondary: #FB7185;
+  --rest-glow: rgba(244, 63, 94, 0.55);
+  --rest-ambient: rgba(244, 63, 94, 0.15);
+  --btn-text-rest: #FFFFFF;
+  
+  --done-primary: #38BDF8;
+  --done-glow: rgba(56, 189, 248, 0.55);
+  
+  --brand-mark-bg: linear-gradient(135deg, #A855F7 0%, #7E22CE 50%, #C084FC 100%);
+  --brand-bolt-color: #FAF5FF;
+  
+  --ring-track: rgba(255, 255, 255, 0.05);
+  --ring-tick: rgba(168, 85, 247, 0.25);
+  --shadow-deck: 0 24px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--border-subtle);
+  --shadow-btn: 0 10px 30px rgba(168, 85, 247, 0.45), 0 4px 12px rgba(0,0,0,0.6);
+}
+
+/* ── 5. TITANIUM RAW (AEROSPACE BRUSHED PLATINUM) ── */
+html[data-theme="titanium-raw"] {
+  --bg-page: #000000;
+  --bg-surface: rgba(255, 255, 255, 0.05);
+  --bg-surface-hover: rgba(255, 255, 255, 0.09);
+  --bg-surface-active: rgba(255, 255, 255, 0.14);
+  --bg-deck: rgba(14, 14, 16, 0.85);
+  --bg-inset: rgba(255, 255, 255, 0.03);
+  
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --border-focus: #F1F5F9;
+  
+  --text-1: #FFFFFF;
+  --text-2: rgba(255, 255, 255, 0.7);
+  --text-3: rgba(255, 255, 255, 0.4);
+  
+  --work-primary: #F1F5F9;
+  --work-secondary: #CBD5E1;
+  --work-glow: rgba(241, 245, 249, 0.45);
+  --work-ambient: rgba(241, 245, 249, 0.09);
+  --btn-text-work: #000000;
+  --badge-text: #000000;
+  
+  --rest-primary: #64748B;
+  --rest-secondary: #475569;
+  --rest-glow: rgba(100, 116, 139, 0.45);
+  --rest-ambient: rgba(100, 116, 139, 0.1);
+  --btn-text-rest: #FFFFFF;
+  
+  --done-primary: #34D399;
+  --done-glow: rgba(52, 211, 153, 0.45);
+  
+  --brand-mark-bg: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 50%, #64748B 100%);
+  --brand-bolt-color: #000000;
+  
+  --ring-track: rgba(255, 255, 255, 0.06);
+  --ring-tick: rgba(255, 255, 255, 0.2);
+  --shadow-deck: 0 24px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--border-subtle);
+  --shadow-btn: 0 10px 30px rgba(241, 245, 249, 0.35), 0 4px 12px rgba(0,0,0,0.7);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BODY & AMBIENT CANVAS
+══════════════════════════════════════════════════════════════════ */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-1);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+  transition: background-color 0.5s var(--ease-smooth), color 0.5s var(--ease-smooth);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease-smooth), background 0.7s var(--ease-smooth);
+}
+
+body.ph-work::before {
+  opacity: 1;
+  background: radial-gradient(circle 650px at 50% 22%, var(--work-ambient), transparent 75%);
+}
+body.ph-rest::before {
+  opacity: 1;
+  background: radial-gradient(circle 650px at 50% 22%, var(--rest-ambient), transparent 75%);
+}
+body.ph-done::before {
+  opacity: 1;
+  background: radial-gradient(circle 650px at 50% 30%, rgba(52, 211, 153, 0.15), transparent 70%);
+}
+
+.app-viewport {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 580px;
+  padding: 0 20px 48px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   REFINED LOGO & HEADER (CLEAN NO EMOJIS)
+══════════════════════════════════════════════════════════════════ */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0 16px;
+  position: relative;
+  z-index: 50;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  user-select: none;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--brand-mark-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px var(--work-glow), inset 0 1px 1px rgba(255,255,255,0.4);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-spring);
+}
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.28) 0%, transparent 60%);
+  border-radius: inherit;
+}
+.brand-mark svg {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+}
+.brand-bolt {
+  fill: var(--brand-bolt-color);
+  transition: fill 0.3s ease;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand-name {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: var(--text-1);
+  line-height: 1;
+}
+.brand-badge {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  background: var(--work-primary);
+  color: var(--badge-text);
+  box-shadow: 0 0 10px var(--work-glow);
+  line-height: 1.1;
+  transition: all 0.3s ease;
+}
+.brand-tag {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease-smooth);
+}
+.icon-btn:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text-1);
+  transform: translateY(-1px);
+}
+.icon-btn:active {
+  transform: scale(0.95);
+}
+.icon-btn.active {
+  background: var(--bg-surface-active);
+  border-color: var(--border-focus);
+  color: var(--text-1);
+}
+
+.audio-off-icon { display: none; }
+.icon-btn.muted .audio-on-icon { display: none; }
+.icon-btn.muted .audio-off-icon { display: block; }
+
+/* ══════════════════════════════════════════════════════════════════
+   THEME POPUP DRAWER (ZERO EMOJIS)
+══════════════════════════════════════════════════════════════════ */
+.theme-drawer {
+  position: absolute;
+  top: 76px;
+  right: 0;
+  background: var(--bg-deck);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-deck);
+  width: 270px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+  animation: slideDown 0.2s var(--ease-spring);
+}
+.theme-drawer.open {
+  display: flex;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.theme-drawer-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.theme-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  border: 1px solid transparent;
+  color: var(--text-1);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.theme-opt:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-subtle);
+}
+.theme-opt.selected {
+  border-color: var(--border-focus);
+  background: var(--bg-surface-active);
+}
+
+.theme-preview-chips {
+  display: flex;
+  gap: 4px;
+}
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HERO STAGE & MATHEMATICALLY CENTERED DIAL
+══════════════════════════════════════════════════════════════════ */
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 16px;
+}
+
+.phase-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 7px 22px;
+  border-radius: var(--r-full);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-3);
+  margin-bottom: 18px;
+  transition: all 0.4s var(--ease-smooth);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.phase-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.phase-pill.work {
+  color: var(--work-primary);
+  border-color: var(--work-primary);
+  background: var(--work-ambient);
+  box-shadow: 0 0 24px var(--work-glow);
+}
+.phase-pill.rest {
+  color: var(--rest-primary);
+  border-color: var(--rest-primary);
+  background: var(--rest-ambient);
+  box-shadow: 0 0 24px var(--rest-glow);
+}
+.phase-pill.done {
+  color: var(--done-primary);
+  border-color: var(--done-primary);
+  background: rgba(52, 211, 153, 0.15);
+  box-shadow: 0 0 24px var(--done-glow);
+}
+
+/* Chronograph Dial */
+.dial-container {
+  position: relative;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.dial-track {
+  fill: none;
+  stroke: var(--ring-track);
+  stroke-width: 12;
+  transition: stroke 0.5s;
+}
+
+.dial-ticks {
+  fill: none;
+  stroke: var(--ring-tick);
+  stroke-width: 2;
+  stroke-dasharray: 2 9.94;
+  transition: stroke 0.5s;
+}
+
+.dial-glow {
+  fill: none;
+  stroke-width: 28;
+  stroke-linecap: round;
+  opacity: 0.22;
+  filter: blur(10px);
+  transition: stroke 0.5s;
+}
+
+.dial-bar {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke 0.5s;
+}
+
+/* 100% Mathematically & Optically Centered Readout */
+.dial-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  padding: 0 16px;
+}
+
+.timer-main {
+  font-family: var(--font-mono);
+  font-size: clamp(3.4rem, 11vw, 5.2rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+  width: 100%;
+  text-align: center;
+  margin: 0 auto;
+  transition: color 0.4s var(--ease-smooth), text-shadow 0.4s var(--ease-smooth);
+}
+.timer-main.work { text-shadow: 0 0 45px var(--work-glow); }
+.timer-main.rest { text-shadow: 0 0 45px var(--rest-glow); }
+.timer-main.warn { animation: pulseDigit 0.5s ease-in-out infinite alternate; }
+
+@keyframes pulseDigit {
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.035); filter: brightness(1.2); }
+}
+
+.timer-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.timer-frac-pill {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 8px;
+  border-radius: var(--r-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.timer-caption-pill {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.04em;
+}
+
+/* Round Dots */
+.round-dots-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 320px;
+  margin-top: 18px;
+}
+
+.r-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.3s var(--ease-spring);
+}
+.r-dot.completed {
+  background: var(--work-primary);
+  border-color: var(--work-primary);
+  box-shadow: 0 0 8px var(--work-glow);
+}
+.r-dot.active {
+  width: 22px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--work-primary), var(--rest-primary));
+  border-color: transparent;
+  box-shadow: 0 0 12px var(--work-glow);
+}
+
+/* Session Info Bar */
+.session-info {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+.info-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--border-subtle);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PLAYBACK CONTROLS (HIGH-CONTRAST SVG ICONS)
+══════════════════════════════════════════════════════════════════ */
+.control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.ctrl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease-spring);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+.ctrl-btn:active {
+  transform: scale(0.92) !important;
+}
+
+.btn-secondary {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+}
+.btn-secondary:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text-1);
+  transform: scale(1.08);
+}
+.btn-secondary svg { display: block; }
+
+.btn-primary {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--work-primary) 0%, var(--work-secondary) 100%);
+  color: var(--btn-text-work);
+  box-shadow: var(--shadow-btn);
+  position: relative;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  transform: scale(1.08);
+}
+.btn-primary.rest-mode {
+  background: linear-gradient(135deg, var(--rest-primary) 0%, var(--rest-secondary) 100%);
+  color: var(--btn-text-rest);
+  box-shadow: 0 10px 30px var(--rest-glow), 0 4px 12px rgba(0,0,0,0.5);
+}
+.btn-primary.running {
+  animation: primaryGlow 2.2s ease-in-out infinite;
+}
+
+@keyframes primaryGlow {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.02); filter: brightness(1.15); }
+}
+
+.icon-play-svg {
+  display: block;
+  margin-left: 3px;
+}
+.icon-pause-svg {
+  display: none;
+}
+.btn-primary.is-playing .icon-play-svg {
+  display: none;
+}
+.btn-primary.is-playing .icon-pause-svg {
+  display: block;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PRECISION HARDWARE-GRADE CONFIGURATION DECK WITH SAVED PRESETS
+══════════════════════════════════════════════════════════════════ */
+.config-deck {
+  margin-top: 24px;
+  background: var(--bg-deck);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-deck);
+  overflow: hidden;
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.deck-trigger {
+  width: 100%;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-1);
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: background 0.15s;
+}
+.deck-trigger:hover {
+  background: var(--bg-surface-hover);
+}
+
+.deck-trigger-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.deck-badge-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+}
+
+.deck-summary-text {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.deck-chevron {
+  color: var(--text-3);
+  transition: transform 0.3s var(--ease-spring);
+}
+.deck-chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.deck-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s var(--ease-smooth);
+}
+.deck-body.open {
+  max-height: 950px;
+}
+
+.deck-inner {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Presets Header & Tray */
+.preset-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.preset-header-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.btn-save-preset-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--work-primary);
+  padding: 3px 8px;
+  border-radius: var(--r-xs);
+  background: var(--work-ambient);
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.btn-save-preset-trigger:hover {
+  border-color: var(--work-primary);
+  background: var(--bg-surface-active);
+}
+
+/* Unified Segmented Preset Track */
+.preset-segmented-track {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--bg-inset);
+  padding: 4px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 12px;
+  gap: 4px;
+}
+
+.seg-btn {
+  flex: 1 1 auto;
+  min-width: 65px;
+  padding: 8px 10px;
+  border-radius: var(--r-xs);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-2);
+  text-align: center;
+  transition: all 0.15s var(--ease-smooth);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+}
+.seg-btn:hover {
+  color: var(--text-1);
+  background: var(--bg-surface-hover);
+}
+.seg-btn.active {
+  background: var(--bg-surface-active);
+  color: var(--text-1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  font-weight: 800;
+}
+.seg-btn.custom-item {
+  padding-right: 6px;
+}
+.seg-del-btn {
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+.seg-del-btn:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Save Preset Inline Box */
+.save-preset-box {
+  display: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  gap: 8px;
+  animation: slideDown 0.2s var(--ease-spring);
+}
+.save-preset-box.open {
+  display: flex;
+}
+.save-preset-input {
+  flex: 1;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: var(--text-1);
+  outline: none;
+}
+.save-preset-input:focus {
+  border-color: var(--work-primary);
+}
+.btn-save-confirm {
+  padding: 6px 12px;
+  background: var(--work-primary);
+  color: var(--badge-text);
+  border-radius: var(--r-xs);
+  font-size: 0.76rem;
+  font-weight: 800;
+  transition: opacity 0.15s;
+}
+.btn-save-confirm:hover {
+  opacity: 0.9;
+}
+.btn-save-cancel {
+  padding: 6px 8px;
+  color: var(--text-3);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.btn-save-cancel:hover {
+  color: var(--text-1);
+}
+
+/* 2. Micro Timeline Progress Bar */
+.mini-timeline-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.mini-timeline-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+.mini-timeline-total {
+  font-family: var(--font-mono);
+  color: var(--text-2);
+}
+.mini-timeline-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-inset);
+  display: flex;
+  overflow: hidden;
+  gap: 1.5px;
+}
+.mini-seg {
+  height: 100%;
+  border-radius: 1px;
+}
+.mini-seg.work { background: var(--work-primary); }
+.mini-seg.rest { background: var(--rest-primary); }
+
+/* 3. Clean Hardware Control Rows (Hairline Dividers - Fully Typable Readouts) */
+.config-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.config-row-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.row-label-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.row-bullet {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.bullet-work { background: var(--work-primary); }
+.bullet-rest { background: var(--rest-primary); }
+.bullet-rounds { background: #E2E8F0; }
+.bullet-prep { background: #A78BFA; }
+
+.row-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: 0.02em;
+}
+
+/* Precision Stepper Unit */
+.stepper-unit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepper-mini-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-xs);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.stepper-mini-btn:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text-1);
+}
+.stepper-mini-btn:active {
+  transform: scale(0.92);
+}
+
+.stepper-readout-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  padding: 0 8px;
+  min-width: 68px;
+  height: 32px;
+}
+.stepper-readout-box:focus-within {
+  border-color: var(--border-focus);
+}
+
+.stepper-digit-inp {
+  width: 24px;
+  background: transparent;
+  border: none;
+  color: var(--text-1);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+}
+.stepper-digit-inp.single-inp {
+  width: 32px;
+}
+.stepper-digit-inp::-webkit-inner-spin-button,
+.stepper-digit-inp::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.stepper-colon {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.stepper-unit-suffix {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-3);
+  margin-left: 1px;
+}
+
+/* Sound Profile Segmented Row */
+.sound-pack-track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--bg-inset);
+  padding: 3px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--border-subtle);
+  gap: 2px;
+}
+.sound-pack-btn {
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-align: center;
+  transition: all 0.15s;
+}
+.sound-pack-btn:hover {
+  color: var(--text-1);
+}
+.sound-pack-btn.active {
+  background: var(--bg-surface-active);
+  color: var(--text-1);
+  font-weight: 800;
+}
+
+/* Audition Pill */
+.audio-audition-pill {
+  padding: 6px 12px;
+  border-radius: var(--r-xs);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  font-size: 0.74rem;
+  font-weight: 700;
+  transition: all 0.15s;
+}
+.audio-audition-pill:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text-1);
+}
+
+/* Keyboard hint footer */
+.keyboard-bar {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-3);
+  margin-top: 18px;
+  padding-bottom: 8px;
+}
+kbd {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 0.65rem;
+  color: var(--text-2);
+}
+
+/* Toast Message */
+.toast-msg {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--bg-deck);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-full);
+  padding: 12px 28px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-1);
+  z-index: 999;
+  box-shadow: var(--shadow-deck);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: transform 0.4s var(--ease-spring);
+}
+.toast-msg.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOBILE & OFFLINE INSTALLATION MODAL
+══════════════════════════════════════════════════════════════════ */
+.mobile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+.mobile-modal-overlay.open {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mobile-modal-box {
+  background: var(--bg-deck);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-deck);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+  animation: scaleUp 0.25s var(--ease-spring);
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-xs);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.modal-close-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.modal-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--work-ambient);
+  border: 1px solid var(--work-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--work-primary);
+}
+
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-1);
+}
+.modal-sub {
+  font-size: 0.76rem;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.device-tab-bar {
+  display: flex;
+  background: var(--bg-inset);
+  padding: 3px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 16px;
+  gap: 4px;
+}
+.device-tab {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--r-xs);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-align: center;
+  transition: all 0.15s;
+}
+.device-tab:hover { color: var(--text-1); }
+.device-tab.active {
+  background: var(--bg-surface-active);
+  color: var(--text-1);
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.step-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 12px;
+}
+.step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--work-ambient);
+  color: var(--work-primary);
+  font-size: 0.76rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-text {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+.step-text strong {
+  color: var(--text-1);
+}
+
+.network-url-card {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.network-url-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.network-url-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  padding: 8px 12px;
+}
+.network-url-text {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--work-primary);
+  font-weight: 700;
+  word-break: break-all;
+}
+.btn-copy-url {
+  padding: 4px 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-1);
+  transition: all 0.15s;
+}
+.btn-copy-url:hover {
+  background: var(--work-primary);
+  color: var(--badge-text);
+  border-color: var(--work-primary);
+}
+
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 0 6px;
+  gap: 10px;
+}
+.qr-frame {
+  background: #FFFFFF;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+@media (max-width: 480px) {
+  .btn-primary { width: 68px; height: 68px; }
+  .btn-secondary { width: 46px; height: 46px; }
+  .brand-name { font-size: 1.2rem; }
+  .app-viewport { padding: 0 16px 36px; }
+  .mobile-modal-box { padding: 20px 16px; }
+}
+  </style>
+</head>
+<body>
+
+<div class="toast-msg" id="toastMsg">Session Complete — Outstanding Workout</div>
+
+<!-- MOBILE OFFLINE INSTALLATION GUIDE MODAL -->
+<div class="mobile-modal-overlay" id="mobileModalOverlay" onclick="if(event.target===this) toggleMobileModal(false)">
+  <div class="mobile-modal-box">
+    <button class="modal-close-btn" onclick="toggleMobileModal(false)">&times;</button>
+    
+    <div class="modal-header">
+      <div class="modal-icon-badge">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+      </div>
+      <div>
+        <div class="modal-title">Use Offline on Mobile</div>
+        <div class="modal-sub">Install as a standalone native-grade app</div>
+      </div>
+    </div>
+
+    <div class="device-tab-bar">
+      <button class="device-tab active" id="tabAndroidBtn" onclick="switchModalTab('android')">Android / Chrome</button>
+      <button class="device-tab" id="tabIosBtn" onclick="switchModalTab('ios')">iPhone (iOS)</button>
+      <button class="device-tab" id="tabNetworkBtn" onclick="switchModalTab('network')">Direct Phone Link</button>
+    </div>
+
+    <!-- Android Content -->
+    <div id="tabAndroidContent">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-text">Open this timer in <strong>Chrome</strong> or <strong>Brave</strong> on your phone.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-text">Tap the browser menu <strong>(⋮ three dots)</strong> in the top right.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-text">Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-text">Done! <strong>FORGE PRO</strong> will open in full-screen standalone mode with zero internet needed.</div>
+      </div>
+      <button class="btn-save-confirm" id="btnNativeInstall" style="width:100%; padding:10px; margin-top:6px; font-size:0.84rem; display:none;" onclick="triggerNativeInstall()">
+        Install App on This Device
+      </button>
+    </div>
+
+    <!-- iOS Safari Content -->
+    <div id="tabIosContent" style="display:none;">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-text">Open this timer in <strong>Safari</strong> on your iPhone or iPad.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-text">Tap the <strong>Share button</strong> (the square with an arrow pointing up <span style="font-size:1.1rem; line-height:0;">⎋</span>).</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-text">Scroll down and tap <strong>"Add to Home Screen"</strong> (＋).</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-text">Tap <strong>Add</strong>. It launches fullscreen without Safari address bars and works completely offline!</div>
+      </div>
+    </div>
+
+    <!-- Direct Phone Link & GitHub Pages Content -->
+    <div id="tabNetworkContent" style="display:none;">
+      <p style="font-size:0.8rem; color:var(--text-2); line-height:1.4;">
+        Open this link on your phone from anywhere (or scan the QR code with your phone camera) to install:
+      </p>
+
+      <div class="network-url-card">
+        <span class="network-url-label">Live GitHub Pages URL</span>
+        <div class="network-url-box">
+          <span class="network-url-text" id="netUrlText">https://adarsh-tripathi7.github.io/prshresearch/interval-timer/</span>
+          <button class="btn-copy-url" onclick="copyNetworkUrl()">Copy</button>
+        </div>
+      </div>
+
+      <div class="qr-section">
+        <span class="network-url-label">Scan with Phone Camera</span>
+        <div class="qr-frame">
+          <canvas id="qrCanvas" width="160" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="app-viewport">
+
+  <!-- HEADER & ATHLETIC PRO LOGO (ZERO EMOJIS) -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L4 7V17L12 22L20 17V7L12 2Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" opacity="0.95"/>
+          <path class="brand-bolt" d="M12 6L7 12H13L11 18L17 11H11L12 6Z" opacity="0.95"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title-row">
+          <span class="brand-name">FORGE</span>
+          <span class="brand-badge">PRO</span>
+        </div>
+        <span class="brand-tag">Interval Trainer</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Mobile & Offline App Install Button -->
+      <button class="icon-btn" id="btnInstallApp" title="Use Offline on Mobile" onclick="toggleMobileModal(true)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          <polyline points="9 8 12 11 15 8"></polyline>
+          <line x1="12" y1="4" x2="12" y2="11"></line>
+        </svg>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button class="icon-btn" id="btnFullscreen" title="Toggle Fullscreen" onclick="toggleFullscreen()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+
+      <!-- Theme Switcher Button (Vector Swatch Icon) -->
+      <button class="icon-btn" id="btnThemeToggle" title="Color Theme (T)" onclick="toggleThemeDrawer()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+          <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+          <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+          <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+        </svg>
+      </button>
+
+      <!-- Audio Mute Button (Vector Speaker Icon) -->
+      <button class="icon-btn" id="btnAudioToggle" title="Toggle Audio (M)" onclick="toggleAudio()">
+        <svg class="audio-on-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" fill-opacity="0.2"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+        <svg class="audio-off-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Theme Drawer Popup (Clean No Emojis) -->
+    <div class="theme-drawer" id="themeDrawer">
+      <div class="theme-drawer-title">Color System</div>
+      <button class="theme-opt selected" onclick="selectTheme('jet-black')">
+        <span>Jet Black (OLED)</span>
+        <div class="theme-preview-chips">
+          <span class="swatch" style="background:#000000"></span>
+          <span class="swatch" style="background:#FF5A26"></span>
+          <span class="swatch" style="background:#38BDF8"></span>
+        </div>
+      </button>
+      <button class="theme-opt" onclick="selectTheme('peach-white')">
+        <span>Peach White</span>
+        <div class="theme-preview-chips">
+          <span class="swatch" style="background:#FAF4EF"></span>
+          <span class="swatch" style="background:#FF5533"></span>
+          <span class="swatch" style="background:#0284C7"></span>
+        </div>
+      </button>
+      <button class="theme-opt" onclick="selectTheme('cyber-neon')">
+        <span>Cyber Neon</span>
+        <div class="theme-preview-chips">
+          <span class="swatch" style="background:#000000"></span>
+          <span class="swatch" style="background:#10B981"></span>
+          <span class="swatch" style="background:#06B6D4"></span>
+        </div>
+      </button>
+      <button class="theme-opt" onclick="selectTheme('nebula-violet')">
+        <span>Nebula Violet</span>
+        <div class="theme-preview-chips">
+          <span class="swatch" style="background:#000000"></span>
+          <span class="swatch" style="background:#A855F7"></span>
+          <span class="swatch" style="background:#F43F5E"></span>
+        </div>
+      </button>
+      <button class="theme-opt" onclick="selectTheme('titanium-raw')">
+        <span>Titanium Raw</span>
+        <div class="theme-preview-chips">
+          <span class="swatch" style="background:#000000"></span>
+          <span class="swatch" style="background:#F1F5F9"></span>
+          <span class="swatch" style="background:#64748B"></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <!-- STAGE: MATHEMATICALLY CENTERED DIAL -->
+  <main class="stage">
+    
+    <!-- Phase Pill (Zero Emojis) -->
+    <div class="phase-pill" id="phasePill">
+      <span class="phase-pill-dot"></span>
+      <span id="phasePillText">READY TO FORGE</span>
+    </div>
+
+    <!-- Chronograph Dial Ring -->
+    <div class="dial-container">
+      <svg class="dial-svg" viewBox="0 0 260 260">
+        <circle class="dial-track" cx="130" cy="130" r="114"/>
+        <circle class="dial-ticks" cx="130" cy="130" r="114"/>
+        <circle class="dial-glow" id="dialGlow" cx="130" cy="130" r="114"
+                stroke="var(--work-primary)" stroke-dasharray="716.3" stroke-dashoffset="716.3"/>
+        <circle class="dial-bar" id="dialBar" cx="130" cy="130" r="114"
+                stroke="var(--work-primary)" stroke-dasharray="716.3" stroke-dashoffset="716.3"/>
+      </svg>
+
+      <!-- 100% Mathematically Centered Readout -->
+      <div class="dial-center">
+        <div class="timer-main" id="timerMain">00:00</div>
+        <div class="timer-meta-row">
+          <span class="timer-frac-pill" id="timerFrac">.00</span>
+          <span class="timer-caption-pill" id="timerCaption">Press play to start</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Round Dots Tracker -->
+    <div class="round-dots-row" id="roundDotsRow"></div>
+
+    <!-- Session Info -->
+    <div class="session-info">
+      <span id="infoRound">—</span>
+      <div class="info-divider"></div>
+      <span id="infoElapsed">00:00 elapsed</span>
+    </div>
+
+    <!-- Playback Controls (High Contrast SVG Icons) -->
+    <div class="control-bar">
+      <!-- Reset Button -->
+      <button class="ctrl-btn btn-secondary" title="Reset Session (R)" onclick="handleReset()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+      </button>
+
+      <!-- Primary Play / Pause Hero Button -->
+      <button class="ctrl-btn btn-primary" id="btnPlay" title="Play / Pause (Space)" onclick="handleTogglePlay()">
+        <svg class="icon-play-svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="7,4 20,12 7,20"></polygon>
+        </svg>
+        <svg class="icon-pause-svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="5" y="4" width="4.5" height="16" rx="2"></rect>
+          <rect x="14.5" y="4" width="4.5" height="16" rx="2"></rect>
+        </svg>
+      </button>
+
+      <!-- Skip Button -->
+      <button class="ctrl-btn btn-secondary" title="Skip Phase (S)" onclick="handleSkip()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 4 15 12 5 20 5 4" fill="currentColor"/>
+          <line x1="19" y1="4" x2="19" y2="20"/>
+        </svg>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- PRECISION HARDWARE-GRADE CONFIGURATION DECK WITH SAVED PRESETS -->
+  <div class="config-deck">
+    
+    <!-- Trigger Header Button -->
+    <button class="deck-trigger" onclick="toggleConfigDeck()">
+      <div class="deck-trigger-left">
+        <div class="deck-badge-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+        </div>
+        <span>Interval Parameters</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="deck-summary-text" id="deckSummaryText">20s / 10s · 8 sets</span>
+        <svg class="deck-chevron expanded" id="deckChevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </button>
+
+    <!-- Collapsible Parameters Deck -->
+    <div class="deck-body open" id="deckBody">
+      <div class="deck-inner">
+
+        <!-- 1. Presets Header & Save Action -->
+        <div class="preset-header-row">
+          <span class="preset-header-title">Routines & Presets</span>
+          <button class="btn-save-preset-trigger" onclick="toggleSavePresetBox()" title="Save Current Parameters">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Save Preset</span>
+          </button>
+        </div>
+
+        <!-- Inline Save Preset Input Drawer -->
+        <div class="save-preset-box" id="savePresetBox">
+          <input type="text" class="save-preset-input" id="inpPresetName" placeholder="Preset name (e.g. Sprint 30)" maxlength="24" onkeydown="if(event.key==='Enter') saveCurrentPreset()"/>
+          <button class="btn-save-confirm" onclick="saveCurrentPreset()">Save</button>
+          <button class="btn-save-cancel" onclick="toggleSavePresetBox(false)">Cancel</button>
+        </div>
+
+        <!-- Dynamic Segmented Preset Track (Built-in + Saved Custom) -->
+        <div class="preset-segmented-track" id="presetTrack">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- 2. Minimalist Workout Timeline Bar -->
+        <div class="mini-timeline-row">
+          <div class="mini-timeline-meta">
+            <span>Session Flow</span>
+            <span class="mini-timeline-total" id="miniTimelineTotal">4:00 Total</span>
+          </div>
+          <div class="mini-timeline-bar" id="miniTimelineBar"></div>
+        </div>
+
+        <!-- 3. Clean Hardware Control Rows (Hairline Dividers - Fully Typable Readouts) -->
+        
+        <!-- Row 1: Work Duration -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <span class="row-bullet bullet-work"></span>
+            <span class="row-label">Work Interval</span>
+          </div>
+          <div class="stepper-unit">
+            <button class="stepper-mini-btn" title="Decrease 5s" onclick="adjustTime('work', -5)">−</button>
+            <div class="stepper-readout-box">
+              <input type="number" class="stepper-digit-inp" id="inpWorkMin" min="0" max="59" value="0" oninput="onConfigInput()"/>
+              <span class="stepper-colon">:</span>
+              <input type="number" class="stepper-digit-inp" id="inpWorkSec" min="0" max="59" value="20" oninput="onConfigInput()"/>
+            </div>
+            <button class="stepper-mini-btn" title="Increase 5s" onclick="adjustTime('work', 5)">+</button>
+          </div>
+        </div>
+
+        <!-- Row 2: Rest Duration -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <span class="row-bullet bullet-rest"></span>
+            <span class="row-label">Rest Interval</span>
+          </div>
+          <div class="stepper-unit">
+            <button class="stepper-mini-btn" title="Decrease 5s" onclick="adjustTime('rest', -5)">−</button>
+            <div class="stepper-readout-box">
+              <input type="number" class="stepper-digit-inp" id="inpRestMin" min="0" max="59" value="0" oninput="onConfigInput()"/>
+              <span class="stepper-colon">:</span>
+              <input type="number" class="stepper-digit-inp" id="inpRestSec" min="0" max="59" value="10" oninput="onConfigInput()"/>
+            </div>
+            <button class="stepper-mini-btn" title="Increase 5s" onclick="adjustTime('rest', 5)">+</button>
+          </div>
+        </div>
+
+        <!-- Row 3: Total Sets / Rounds (Directly Typable) -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <span class="row-bullet bullet-rounds"></span>
+            <span class="row-label">Total Rounds</span>
+          </div>
+          <div class="stepper-unit">
+            <button class="stepper-mini-btn" onclick="adjustRounds(-1)">−</button>
+            <div class="stepper-readout-box">
+              <input type="number" class="stepper-digit-inp single-inp" id="inpRounds" min="1" max="99" value="8" oninput="onConfigInput()"/>
+            </div>
+            <button class="stepper-mini-btn" onclick="adjustRounds(1)">+</button>
+          </div>
+        </div>
+
+        <!-- Row 4: Prep Time (Directly Typable) -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <span class="row-bullet bullet-prep"></span>
+            <span class="row-label">Preparation Time</span>
+          </div>
+          <div class="stepper-unit">
+            <button class="stepper-mini-btn" onclick="adjustCountdown(-1)">−</button>
+            <div class="stepper-readout-box">
+              <input type="number" class="stepper-digit-inp single-inp" id="inpCountdown" min="0" max="60" value="3" oninput="onConfigInput()"/>
+              <span class="stepper-unit-suffix">s</span>
+            </div>
+            <button class="stepper-mini-btn" onclick="adjustCountdown(1)">+</button>
+          </div>
+        </div>
+
+        <!-- Row 5: Multi-Sound Acoustic Profile Selector -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-3)">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+            <span class="row-label" style="font-size:0.82rem;">Sound Pack</span>
+          </div>
+          <div class="sound-pack-track">
+            <button class="sound-pack-btn active" id="sndSynth" onclick="selectSoundPack('synth')">Synth</button>
+            <button class="sound-pack-btn" id="sndBoxing" onclick="selectSoundPack('boxing')">Boxing</button>
+            <button class="sound-pack-btn" id="sndChrono" onclick="selectSoundPack('chrono')">Chrono</button>
+            <button class="sound-pack-btn" id="sndCyber" onclick="selectSoundPack('cyber')">Cyber</button>
+          </div>
+        </div>
+
+        <!-- Row 6: Audition Sound Button -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <span class="row-label" style="font-size:0.8rem; color:var(--text-2)">Acoustic Preview</span>
+          </div>
+          <button class="audio-audition-pill" onclick="testAudioCue()">Audition Tone</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYBOARD SHORTCUTS HINT (NO EMOJIS) -->
+  <div class="keyboard-bar">
+    <kbd>Space</kbd> play/pause &nbsp;·&nbsp; <kbd>R</kbd> reset &nbsp;·&nbsp; <kbd>S</kbd> skip &nbsp;·&nbsp; <kbd>M</kbd> mute &nbsp;·&nbsp; <kbd>T</kbd> theme
+  </div>
+
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   HIGH-PRECISION WEB AUDIO MULTI-SOUND SYSTEM
+══════════════════════════════════════════════════════════════════ */
+let audioCtx = null;
+let isAudioEnabled = true;
+let activeSoundPack = 'synth'; // 'synth' | 'boxing' | 'chrono' | 'cyber'
+
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function synthTone(freq, duration, type, volume, delay = 0, freqEnd = null) {
+  if (!isAudioEnabled) return;
+  try {
+    const ctx = getAudioContext();
+    const startTime = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, startTime);
+    if (freqEnd !== null) {
+      osc.frequency.exponentialRampToValueAtTime(Math.max(10, freqEnd), startTime + duration);
+    }
+
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(volume, startTime + 0.008);
+    gain.gain.setValueAtTime(volume * 0.9, startTime + duration * 0.5);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.03);
+  } catch (e) {}
+}
+
+function synthNoiseBurst(volume, duration = 0.05, delay = 0) {
+  if (!isAudioEnabled) return;
+  try {
+    const ctx = getAudioContext();
+    const startTime = ctx.currentTime + delay;
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2.5);
+    }
+
+    const noise = ctx.createBufferSource();
+    const gain = ctx.createGain();
+
+    noise.buffer = buffer;
+    noise.connect(gain);
+    gain.connect(ctx.destination);
+
+    gain.gain.setValueAtTime(volume, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    noise.start(startTime);
+    noise.stop(startTime + duration + 0.02);
+  } catch (e) {}
+}
+
+/* ── 4 ELITE SOUND PACKS ── */
+const SoundPacks = {
+  synth: {
+    countdownStart() {
+      synthTone(440, 0.10, 'square', 0.22, 0);
+      synthTone(554, 0.10, 'square', 0.22, 0.12);
+      synthTone(880, 0.22, 'triangle', 0.28, 0.24);
+      synthNoiseBurst(0.25, 0.04, 0);
+    },
+    workStart() {
+      synthTone(150, 0.35, 'sine', 0.70, 0, 45);
+      synthTone(880, 0.14, 'square', 0.25, 0.01);
+      synthTone(1320, 0.12, 'sine', 0.20, 0.04);
+      synthNoiseBurst(0.45, 0.06, 0);
+    },
+    restStart() {
+      synthTone(987.77, 0.35, 'sine', 0.32, 0);
+      synthTone(783.99, 0.38, 'triangle', 0.24, 0.16);
+      synthTone(587.33, 0.45, 'sine', 0.20, 0.34);
+    },
+    tick() {
+      synthTone(1050, 0.06, 'square', 0.22, 0);
+    },
+    warningBeep() {
+      synthTone(1250, 0.07, 'square', 0.24, 0);
+      synthTone(1250, 0.07, 'square', 0.24, 0.11);
+    },
+    sessionComplete() {
+      const chord = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      chord.forEach((freq, i) => {
+        synthTone(freq, 0.45, 'triangle', 0.32, i * 0.15);
+        synthTone(freq * 1.5, 0.25, 'sine', 0.12, i * 0.15);
+      });
+      synthNoiseBurst(0.35, 0.06, 0);
+    }
+  },
+
+  boxing: {
+    countdownStart() {
+      synthTone(600, 0.06, 'triangle', 0.3, 0);
+      synthTone(600, 0.06, 'triangle', 0.3, 0.15);
+      synthTone(1200, 0.25, 'sine', 0.4, 0.3);
+    },
+    workStart() {
+      const bellFreqs = [784, 1240, 2180, 3420];
+      bellFreqs.forEach(f => {
+        synthTone(f, 0.75, 'triangle', 0.35, 0);
+        synthTone(f * 1.01, 0.65, 'sine', 0.25, 0);
+      });
+      synthNoiseBurst(0.60, 0.03, 0);
+    },
+    restStart() {
+      synthTone(220, 0.9, 'sine', 0.5, 0);
+      synthTone(440, 0.7, 'triangle', 0.3, 0.02);
+      synthTone(660, 0.5, 'sine', 0.2, 0.04);
+    },
+    tick() {
+      synthTone(800, 0.03, 'triangle', 0.35, 0, 300);
+      synthNoiseBurst(0.2, 0.02, 0);
+    },
+    warningBeep() {
+      synthTone(1568, 0.12, 'sine', 0.35, 0);
+      synthTone(1568, 0.12, 'sine', 0.35, 0.14);
+    },
+    sessionComplete() {
+      [0, 0.22, 0.44].forEach(delay => {
+        [784, 1240, 2180].forEach(f => synthTone(f, 0.8, 'triangle', 0.35, delay));
+        synthNoiseBurst(0.4, 0.03, delay);
+      });
+    }
+  },
+
+  chrono: {
+    countdownStart() {
+      synthTone(1000, 0.08, 'sine', 0.3, 0);
+      synthTone(1000, 0.08, 'sine', 0.3, 0.14);
+      synthTone(2000, 0.25, 'sine', 0.4, 0.28);
+    },
+    workStart() {
+      synthTone(2400, 0.22, 'square', 0.35, 0);
+      synthTone(2480, 0.22, 'sawtooth', 0.25, 0);
+      synthTone(2400, 0.22, 'square', 0.35, 0.12);
+    },
+    restStart() {
+      synthTone(880, 0.12, 'sine', 0.35, 0);
+      synthTone(660, 0.25, 'sine', 0.35, 0.10);
+    },
+    tick() {
+      synthTone(2048, 0.04, 'sine', 0.28, 0);
+    },
+    warningBeep() {
+      synthTone(1760, 0.06, 'sine', 0.32, 0);
+      synthTone(1760, 0.06, 'sine', 0.32, 0.10);
+    },
+    sessionComplete() {
+      [2000, 2400, 2800, 3200].forEach((f, i) => {
+        synthTone(f, 0.3, 'sine', 0.3, i * 0.12);
+      });
+    }
+  },
+
+  cyber: {
+    countdownStart() {
+      synthTone(200, 0.12, 'sawtooth', 0.25, 0, 800);
+      synthTone(800, 0.25, 'sine', 0.35, 0.15, 1600);
+    },
+    workStart() {
+      synthTone(60, 0.5, 'sine', 0.8, 0, 180);
+      synthTone(1200, 0.3, 'sawtooth', 0.25, 0, 300);
+      synthNoiseBurst(0.4, 0.08, 0);
+    },
+    restStart() {
+      [440, 554.37, 659.25, 830.61].forEach((f, i) => {
+        synthTone(f, 0.6, 'sine', 0.25, i * 0.08);
+      });
+    },
+    tick() {
+      synthTone(1800, 0.03, 'sine', 0.25, 0);
+    },
+    warningBeep() {
+      synthTone(2200, 0.05, 'sawtooth', 0.25, 0);
+      synthTone(2400, 0.05, 'sawtooth', 0.25, 0.09);
+    },
+    sessionComplete() {
+      [300, 600, 1200, 2400].forEach((f, i) => {
+        synthTone(f, 0.6, 'sine', 0.3, i * 0.14, f * 1.5);
+      });
+    }
+  }
+};
+
+const SoundEffects = {
+  countdownStart() { SoundPacks[activeSoundPack].countdownStart(); },
+  workStart() { SoundPacks[activeSoundPack].workStart(); },
+  restStart() { SoundPacks[activeSoundPack].restStart(); },
+  tick() { SoundPacks[activeSoundPack].tick(); },
+  warningBeep() { SoundPacks[activeSoundPack].warningBeep(); },
+  sessionComplete() { SoundPacks[activeSoundPack].sessionComplete(); }
+};
+
+function selectSoundPack(packName) {
+  activeSoundPack = packName;
+  localStorage.setItem('forge_sound_pack', packName);
+  ['sndSynth', 'sndBoxing', 'sndChrono', 'sndCyber'].forEach(id => {
+    document.getElementById(id)?.classList.remove('active');
+  });
+  const btnId = `snd${packName.charAt(0).toUpperCase() + packName.slice(1)}`;
+  document.getElementById(btnId)?.classList.add('active');
+  getAudioContext();
+  SoundEffects.workStart();
+  showToast(`Sound Pack: ${packName.toUpperCase()}`);
+}
+
+function testAudioCue() {
+  getAudioContext();
+  SoundEffects.workStart();
+  showToast('Audio Profile Auditioned');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCREEN WAKE LOCK (KEEPS PHONE DISPLAY ON DURING WORKOUTS)
+══════════════════════════════════════════════════════════════════ */
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch (err) {}
+}
+
+function releaseWakeLock() {
+  if (wakeLock) {
+    wakeLock.release().catch(() => {});
+    wakeLock = null;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PWA SERVICE WORKER REGISTRATION & INSTALL PROMPT
+══════════════════════════════════════════════════════════════════ */
+let deferredInstallPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      console.log('FORGE PRO Service Worker active:', reg.scope);
+    }).catch((err) => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btnNative = document.getElementById('btnNativeInstall');
+  if (btnNative) btnNative.style.display = 'block';
+});
+
+function triggerNativeInstall() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        showToast('FORGE PRO Installed on Device!');
+      }
+      deferredInstallPrompt = null;
+      toggleMobileModal(false);
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   APPLICATION STATE
+══════════════════════════════════════════════════════════════════ */
+const STATE = {
+  phase: 'idle', // 'idle' | 'countdown' | 'work' | 'rest' | 'done'
+  isRunning: false,
+  currentRound: 0,
+  totalRounds: 8,
+  workDurationMs: 20000,
+  restDurationMs: 10000,
+  countdownDurationMs: 3000,
+  remainingMs: 0,
+  elapsedMs: 0,
+  rafId: null,
+  lastTimestamp: 0,
+  lastTriggeredSec: -1,
+  activeTheme: 'jet-black',
+  activePresetId: 'tabata'
+};
+
+const CIRCUMFERENCE = 2 * Math.PI * 114;
+
+/* ══════════════════════════════════════════════════════════════════
+   DOM REFERENCES
+══════════════════════════════════════════════════════════════════ */
+const DOM = {
+  timerMain: document.getElementById('timerMain'),
+  timerFrac: document.getElementById('timerFrac'),
+  timerCaption: document.getElementById('timerCaption'),
+  phasePill: document.getElementById('phasePill'),
+  phasePillText: document.getElementById('phasePillText'),
+  dialBar: document.getElementById('dialBar'),
+  dialGlow: document.getElementById('dialGlow'),
+  roundDotsRow: document.getElementById('roundDotsRow'),
+  infoRound: document.getElementById('infoRound'),
+  infoElapsed: document.getElementById('infoElapsed'),
+  btnPlay: document.getElementById('btnPlay'),
+  btnAudioToggle: document.getElementById('btnAudioToggle'),
+  themeDrawer: document.getElementById('themeDrawer'),
+  toastMsg: document.getElementById('toastMsg'),
+  deckSummaryText: document.getElementById('deckSummaryText'),
+  deckBody: document.getElementById('deckBody'),
+  deckChevron: document.getElementById('deckChevron'),
+  inpWorkMin: document.getElementById('inpWorkMin'),
+  inpWorkSec: document.getElementById('inpWorkSec'),
+  inpRestMin: document.getElementById('inpRestMin'),
+  inpRestSec: document.getElementById('inpRestSec'),
+  inpRounds: document.getElementById('inpRounds'),
+  inpCountdown: document.getElementById('inpCountdown'),
+  miniTimelineTotal: document.getElementById('miniTimelineTotal'),
+  miniTimelineBar: document.getElementById('miniTimelineBar'),
+  presetTrack: document.getElementById('presetTrack'),
+  savePresetBox: document.getElementById('savePresetBox'),
+  inpPresetName: document.getElementById('inpPresetName'),
+  mobileModalOverlay: document.getElementById('mobileModalOverlay'),
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   CHRONOGRAPH DIAL CONTROLLER
+══════════════════════════════════════════════════════════════════ */
+function updateDial(progress, isWorkMode) {
+  const clampedProgress = Math.max(0, Math.min(1, progress));
+  const dashOffset = CIRCUMFERENCE * (1 - clampedProgress);
+
+  DOM.dialBar.setAttribute('stroke-dashoffset', dashOffset);
+  DOM.dialGlow.setAttribute('stroke-dashoffset', dashOffset);
+
+  const activeColor = isWorkMode ? 'var(--work-primary)' : 'var(--rest-primary)';
+  DOM.dialBar.style.stroke = activeColor;
+  DOM.dialGlow.style.stroke = activeColor;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ROUND DOTS CONTROLLER
+══════════════════════════════════════════════════════════════════ */
+function renderDots() {
+  DOM.roundDotsRow.innerHTML = '';
+  for (let i = 0; i < STATE.totalRounds; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'r-dot';
+    dot.id = `roundDot${i}`;
+    DOM.roundDotsRow.appendChild(dot);
+  }
+}
+
+function updateDots() {
+  for (let i = 0; i < STATE.totalRounds; i++) {
+    const dot = document.getElementById(`roundDot${i}`);
+    if (!dot) continue;
+    
+    if (i < STATE.currentRound - 1) {
+      dot.className = 'r-dot completed';
+    } else if (i === STATE.currentRound - 1 && STATE.phase !== 'idle') {
+      dot.className = 'r-dot active';
+    } else {
+      dot.className = 'r-dot';
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FORMATTERS
+══════════════════════════════════════════════════════════════════ */
+function formatTime(ms) {
+  const safeMs = Math.max(0, ms);
+  const minutes = Math.floor(safeMs / 60000);
+  const seconds = Math.floor((safeMs % 60000) / 1000);
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function formatFractional(ms) {
+  const safeMs = Math.max(0, ms);
+  const centis = Math.floor((safeMs % 1000) / 10);
+  return `.${String(centis).padStart(2, '0')}`;
+}
+
+function formatElapsed(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TIMELINE BAR BUILDER
+══════════════════════════════════════════════════════════════════ */
+function updateTimelineBar() {
+  const wSec = (parseInt(DOM.inpWorkMin.value) || 0) * 60 + (parseInt(DOM.inpWorkSec.value) || 0);
+  const rSec = (parseInt(DOM.inpRestMin.value) || 0) * 60 + (parseInt(DOM.inpRestSec.value) || 0);
+  const rounds = Math.max(1, parseInt(DOM.inpRounds.value) || 8);
+  const prepSec = Math.max(0, parseInt(DOM.inpCountdown.value) || 0);
+
+  const totalSeconds = prepSec + (wSec * rounds) + (rSec * Math.max(0, rounds - 1));
+  const tMin = Math.floor(totalSeconds / 60);
+  const tSec = totalSeconds % 60;
+  DOM.miniTimelineTotal.textContent = `${tMin}:${String(tSec).padStart(2, '0')} Total`;
+
+  DOM.miniTimelineBar.innerHTML = '';
+  for (let i = 0; i < rounds; i++) {
+    const workSeg = document.createElement('div');
+    workSeg.className = 'mini-seg work';
+    workSeg.style.flex = wSec;
+    DOM.miniTimelineBar.appendChild(workSeg);
+
+    if (i < rounds - 1) {
+      const restSeg = document.createElement('div');
+      restSeg.className = 'mini-seg rest';
+      restSeg.style.flex = rSec;
+      DOM.miniTimelineBar.appendChild(restSeg);
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER UI (ZERO EMOJIS)
+══════════════════════════════════════════════════════════════════ */
+function renderUI() {
+  const { phase, remainingMs, currentRound, totalRounds, workDurationMs, restDurationMs, countdownDurationMs, elapsedMs, isRunning } = STATE;
+  const isWork = phase === 'work';
+  const isRest = phase === 'rest';
+  const isCountdown = phase === 'countdown';
+  const isDone = phase === 'done';
+
+  // Primary Center Digits
+  DOM.timerMain.textContent = formatTime(remainingMs);
+  DOM.timerFrac.textContent = `${formatFractional(remainingMs)}s`;
+
+  // Warning pulse
+  const isWarning = remainingMs <= 3100 && remainingMs > 0 && !isCountdown && !isDone && phase !== 'idle';
+  DOM.timerMain.className = 'timer-main' + 
+    (isWork ? ' work' : isRest ? ' rest' : '') +
+    (isWarning ? ' warn' : '');
+
+  // Phase Pill (Zero Emojis)
+  const pillConfig = {
+    work: ['work', 'WORK PHASE'],
+    rest: ['rest', 'REST INTERVAL'],
+    countdown: ['', 'PREPARATION'],
+    done: ['done', 'WORKOUT COMPLETE'],
+    idle: ['', 'READY TO FORGE']
+  };
+  const [pillClass, pillText] = pillConfig[phase] || ['', 'READY TO FORGE'];
+  DOM.phasePill.className = `phase-pill ${pillClass}`.trim();
+  DOM.phasePillText.textContent = pillText;
+
+  // Background Ambient
+  document.body.className = isWork ? 'ph-work' : isRest ? 'ph-rest' : isDone ? 'ph-done' : '';
+
+  // Timer Subtitle
+  if (isWork || isRest) {
+    DOM.timerCaption.textContent = `Round ${currentRound} of ${totalRounds}`;
+  } else if (isCountdown) {
+    DOM.timerCaption.textContent = 'Session starting in...';
+  } else if (isDone) {
+    DOM.timerCaption.textContent = `All ${totalRounds} rounds completed!`;
+  } else {
+    DOM.timerCaption.textContent = 'Press play to start';
+  }
+
+  // Dial Progress
+  const totalPhaseMs = isWork ? workDurationMs : isRest ? restDurationMs : isCountdown ? countdownDurationMs : 1;
+  updateDial(remainingMs / totalPhaseMs, !isRest);
+
+  // Dots & Info
+  updateDots();
+  DOM.infoRound.textContent = isDone ? `${totalRounds} rounds done` : currentRound ? `Round ${currentRound}/${totalRounds}` : '—';
+  DOM.infoElapsed.textContent = `${formatElapsed(elapsedMs)} elapsed`;
+
+  // Play Button & SVG Icon State
+  DOM.btnPlay.classList.toggle('is-playing', isRunning);
+  DOM.btnPlay.classList.toggle('rest-mode', isRest);
+  DOM.btnPlay.classList.toggle('running', isRunning);
+
+  // Summary Deck Tag
+  const wSec = (parseInt(DOM.inpWorkMin.value) || 0) * 60 + (parseInt(DOM.inpWorkSec.value) || 0);
+  const rSec = (parseInt(DOM.inpRestMin.value) || 0) * 60 + (parseInt(DOM.inpRestSec.value) || 0);
+  const rounds = Math.max(1, parseInt(DOM.inpRounds.value) || 8);
+  const formatSec = s => s >= 60 ? `${Math.floor(s / 60)}m${s % 60 ? (s % 60) + 's' : ''}` : `${s}s`;
+  DOM.deckSummaryText.textContent = `${formatSec(wSec)} / ${formatSec(rSec)} · ${rounds} sets`;
+
+  updateTimelineBar();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HIGH-PRECISION RAF TICKER
+══════════════════════════════════════════════════════════════════ */
+function ticker(now) {
+  if (!STATE.isRunning) return;
+
+  const delta = now - STATE.lastTimestamp;
+  STATE.lastTimestamp = now;
+  STATE.elapsedMs += delta;
+  STATE.remainingMs -= delta;
+
+  const currentSec = Math.ceil(Math.max(0, STATE.remainingMs) / 1000);
+  if (currentSec !== STATE.lastTriggeredSec) {
+    STATE.lastTriggeredSec = currentSec;
+
+    if (STATE.phase === 'countdown' && currentSec >= 1) {
+      SoundEffects.tick();
+    }
+
+    if ((STATE.phase === 'work' || STATE.phase === 'rest') && currentSec <= 3 && currentSec >= 1) {
+      SoundEffects.warningBeep();
+    }
+  }
+
+  if (STATE.remainingMs <= 0) {
+    advancePhase(-STATE.remainingMs);
+    return;
+  }
+
+  renderUI();
+  STATE.rafId = requestAnimationFrame(ticker);
+}
+
+function advancePhase(overflowMs = 0) {
+  if (STATE.phase === 'countdown') {
+    STATE.phase = 'work';
+    STATE.currentRound = 1;
+    STATE.remainingMs = STATE.workDurationMs - overflowMs;
+    STATE.lastTriggeredSec = -1;
+    SoundEffects.workStart();
+  } else if (STATE.phase === 'work') {
+    STATE.phase = 'rest';
+    STATE.remainingMs = STATE.restDurationMs - overflowMs;
+    STATE.lastTriggeredSec = -1;
+    SoundEffects.restStart();
+  } else if (STATE.phase === 'rest') {
+    if (STATE.currentRound >= STATE.totalRounds) {
+      STATE.phase = 'done';
+      STATE.isRunning = false;
+      STATE.remainingMs = 0;
+      releaseWakeLock();
+      SoundEffects.sessionComplete();
+      showToast('Session Complete — Outstanding Workout');
+      renderUI();
+      return;
+    }
+    STATE.currentRound++;
+    STATE.phase = 'work';
+    STATE.remainingMs = STATE.workDurationMs - overflowMs;
+    STATE.lastTriggeredSec = -1;
+    SoundEffects.workStart();
+  }
+
+  renderUI();
+  STATE.lastTimestamp = performance.now();
+  STATE.rafId = requestAnimationFrame(ticker);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PLAYBACK ACTIONS
+══════════════════════════════════════════════════════════════════ */
+function handleTogglePlay() {
+  getAudioContext();
+
+  if (STATE.phase === 'done') {
+    handleReset();
+    return;
+  }
+
+  if (!STATE.isRunning) {
+    requestWakeLock();
+    if (STATE.phase === 'idle') {
+      readConfigFromUI();
+      if (STATE.countdownDurationMs > 0) {
+        STATE.phase = 'countdown';
+        STATE.remainingMs = STATE.countdownDurationMs;
+      } else {
+        STATE.phase = 'work';
+        STATE.currentRound = 1;
+        STATE.remainingMs = STATE.workDurationMs;
+      }
+      STATE.lastTriggeredSec = -1;
+      SoundEffects.countdownStart();
+    }
+    STATE.isRunning = true;
+    STATE.lastTimestamp = performance.now();
+    STATE.rafId = requestAnimationFrame(ticker);
+  } else {
+    STATE.isRunning = false;
+    releaseWakeLock();
+    cancelAnimationFrame(STATE.rafId);
+    STATE.lastTriggeredSec = -1;
+  }
+  renderUI();
+}
+
+function handleSkip() {
+  if (STATE.phase === 'idle' || STATE.phase === 'done') return;
+  cancelAnimationFrame(STATE.rafId);
+  STATE.lastTriggeredSec = -1;
+  advancePhase(0);
+}
+
+function handleReset() {
+  STATE.isRunning = false;
+  releaseWakeLock();
+  cancelAnimationFrame(STATE.rafId);
+  STATE.phase = 'idle';
+  STATE.currentRound = 0;
+  STATE.remainingMs = 0;
+  STATE.elapsedMs = 0;
+  STATE.lastTriggeredSec = -1;
+  updateDial(1, true);
+  renderUI();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CUSTOM PRESETS & PERSISTENCE ENGINE
+══════════════════════════════════════════════════════════════════ */
+const DEFAULT_PRESETS = [
+  { id: 'tabata', name: 'Tabata', wMin: 0, wSec: 20, rMin: 0, rSec: 10, rounds: 8, prepSec: 3, isDefault: true },
+  { id: 'hiit',   name: 'HIIT',   wMin: 0, wSec: 40, rMin: 0, rSec: 20, rounds: 8, prepSec: 3, isDefault: true },
+  { id: 'boxing', name: 'Boxing', wMin: 3, wSec: 0,  rMin: 1, rSec: 0,  rounds: 6, prepSec: 5, isDefault: true }
+];
+
+function getSavedCustomPresets() {
+  try {
+    return JSON.parse(localStorage.getItem('forge_custom_presets')) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveCustomPresetsToStorage(presets) {
+  localStorage.setItem('forge_custom_presets', JSON.stringify(presets));
+}
+
+function saveActiveConfig() {
+  const config = {
+    wMin: parseInt(DOM.inpWorkMin.value) || 0,
+    wSec: parseInt(DOM.inpWorkSec.value) || 0,
+    rMin: parseInt(DOM.inpRestMin.value) || 0,
+    rSec: parseInt(DOM.inpRestSec.value) || 0,
+    rounds: parseInt(DOM.inpRounds.value) || 8,
+    prepSec: parseInt(DOM.inpCountdown.value) || 3,
+    activePresetId: STATE.activePresetId
+  };
+  localStorage.setItem('forge_active_config', JSON.stringify(config));
+}
+
+function renderPresetTrack() {
+  const customPresets = getSavedCustomPresets();
+  const allPresets = [...DEFAULT_PRESETS, ...customPresets];
+
+  DOM.presetTrack.innerHTML = '';
+
+  allPresets.forEach(preset => {
+    const btn = document.createElement('button');
+    const isActive = STATE.activePresetId === preset.id;
+    btn.className = `seg-btn ${isActive ? 'active' : ''} ${!preset.isDefault ? 'custom-item' : ''}`;
+    btn.id = `presetBtn_${preset.id}`;
+    
+    // Label
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = preset.name;
+    btn.appendChild(labelSpan);
+
+    btn.onclick = () => loadPreset(preset);
+
+    // If custom, add subtle delete button
+    if (!preset.isDefault) {
+      const delBtn = document.createElement('span');
+      delBtn.className = 'seg-del-btn';
+      delBtn.innerHTML = '&times;';
+      delBtn.title = `Delete ${preset.name}`;
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteCustomPreset(preset.id);
+      };
+      btn.appendChild(delBtn);
+    }
+
+    DOM.presetTrack.appendChild(btn);
+  });
+}
+
+function loadPreset(preset) {
+  if (STATE.isRunning) return;
+  STATE.activePresetId = preset.id;
+
+  DOM.inpWorkMin.value = preset.wMin;
+  DOM.inpWorkSec.value = preset.wSec;
+  DOM.inpRestMin.value = preset.rMin;
+  DOM.inpRestSec.value = preset.rSec;
+  DOM.inpRounds.value = preset.rounds;
+  DOM.inpCountdown.value = preset.prepSec !== undefined ? preset.prepSec : 3;
+
+  if (STATE.phase === 'idle') {
+    STATE.workDurationMs = (preset.wMin * 60 + preset.wSec) * 1000;
+    STATE.restDurationMs = (preset.rMin * 60 + preset.rSec) * 1000;
+    STATE.totalRounds = preset.rounds;
+    STATE.countdownDurationMs = (preset.prepSec !== undefined ? preset.prepSec : 3) * 1000;
+    renderDots();
+  }
+
+  renderPresetTrack();
+  saveActiveConfig();
+  renderUI();
+  showToast(`Routine: ${preset.name}`);
+}
+
+function toggleSavePresetBox(forceState) {
+  const isOpen = forceState !== undefined ? forceState : !DOM.savePresetBox.classList.contains('open');
+  DOM.savePresetBox.classList.toggle('open', isOpen);
+  if (isOpen) {
+    DOM.inpPresetName.value = '';
+    setTimeout(() => DOM.inpPresetName.focus(), 50);
+  }
+}
+
+function saveCurrentPreset() {
+  const name = DOM.inpPresetName.value.trim();
+  if (!name) {
+    showToast('Please enter a preset name');
+    return;
+  }
+
+  const wMin = parseInt(DOM.inpWorkMin.value) || 0;
+  const wSec = parseInt(DOM.inpWorkSec.value) || 0;
+  const rMin = parseInt(DOM.inpRestMin.value) || 0;
+  const rSec = parseInt(DOM.inpRestSec.value) || 0;
+  const rounds = Math.max(1, parseInt(DOM.inpRounds.value) || 8);
+  const prepSec = Math.max(0, parseInt(DOM.inpCountdown.value) || 0);
+
+  const newPreset = {
+    id: `custom_${Date.now()}`,
+    name,
+    wMin,
+    wSec,
+    rMin,
+    rSec,
+    rounds,
+    prepSec,
+    isDefault: false
+  };
+
+  const customPresets = getSavedCustomPresets();
+  customPresets.push(newPreset);
+  saveCustomPresetsToStorage(customPresets);
+
+  STATE.activePresetId = newPreset.id;
+  toggleSavePresetBox(false);
+  renderPresetTrack();
+  saveActiveConfig();
+  showToast(`Preset '${name}' saved!`);
+}
+
+function deleteCustomPreset(id) {
+  let customPresets = getSavedCustomPresets();
+  customPresets = customPresets.filter(p => p.id !== id);
+  saveCustomPresetsToStorage(customPresets);
+
+  if (STATE.activePresetId === id) {
+    STATE.activePresetId = 'tabata';
+  }
+  renderPresetTrack();
+  saveActiveConfig();
+  showToast('Preset deleted');
+}
+
+function readConfigFromUI() {
+  const wMin = parseInt(DOM.inpWorkMin.value) || 0;
+  const wSec = parseInt(DOM.inpWorkSec.value) || 0;
+  const rMin = parseInt(DOM.inpRestMin.value) || 0;
+  const rSec = parseInt(DOM.inpRestSec.value) || 0;
+
+  STATE.workDurationMs = Math.max(1000, (wMin * 60 + wSec) * 1000);
+  STATE.restDurationMs = Math.max(1000, (rMin * 60 + rSec) * 1000);
+  STATE.totalRounds = Math.max(1, parseInt(DOM.inpRounds.value) || 8);
+  STATE.countdownDurationMs = Math.max(0, (parseInt(DOM.inpCountdown.value) || 3) * 1000);
+
+  renderDots();
+  updateTimelineBar();
+  saveActiveConfig();
+}
+
+function onConfigInput() {
+  if (STATE.phase === 'idle') readConfigFromUI();
+  STATE.activePresetId = null; // custom modified
+  renderPresetTrack();
+  saveActiveConfig();
+  renderUI();
+}
+
+function adjustTime(type, deltaSeconds) {
+  const minInput = type === 'work' ? DOM.inpWorkMin : DOM.inpRestMin;
+  const secInput = type === 'work' ? DOM.inpWorkSec : DOM.inpRestSec;
+  const currentTotalSec = (parseInt(minInput.value) || 0) * 60 + (parseInt(secInput.value) || 0);
+  const nextTotalSec = Math.max(1, Math.min(3599, currentTotalSec + deltaSeconds));
+
+  minInput.value = Math.floor(nextTotalSec / 60);
+  secInput.value = nextTotalSec % 60;
+  onConfigInput();
+}
+
+function adjustRounds(delta) {
+  const current = parseInt(DOM.inpRounds.value) || 8;
+  const next = Math.max(1, Math.min(99, current + delta));
+  DOM.inpRounds.value = next;
+  onConfigInput();
+}
+
+function adjustCountdown(delta) {
+  const current = parseInt(DOM.inpCountdown.value) || 3;
+  const next = Math.max(0, Math.min(60, current + delta));
+  DOM.inpCountdown.value = next;
+  onConfigInput();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOBILE MODAL & QR CODE GENERATOR
+══════════════════════════════════════════════════════════════════ */
+function getAppUrl() {
+  if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+    return window.location.href;
+  }
+  return 'https://adarsh-tripathi7.github.io/prshresearch/interval-timer/';
+}
+
+function toggleMobileModal(open) {
+  DOM.mobileModalOverlay.classList.toggle('open', open);
+  if (open) {
+    const url = getAppUrl();
+    const netEl = document.getElementById('netUrlText');
+    if (netEl) netEl.textContent = url;
+    drawQRCode(url);
+  }
+}
+
+function switchModalTab(tabName) {
+  document.getElementById('tabAndroidContent').style.display = tabName === 'android' ? 'block' : 'none';
+  document.getElementById('tabIosContent').style.display = tabName === 'ios' ? 'block' : 'none';
+  document.getElementById('tabNetworkContent').style.display = tabName === 'network' ? 'block' : 'none';
+
+  document.getElementById('tabAndroidBtn').classList.toggle('active', tabName === 'android');
+  document.getElementById('tabIosBtn').classList.toggle('active', tabName === 'ios');
+  document.getElementById('tabNetworkBtn').classList.toggle('active', tabName === 'network');
+
+  if (tabName === 'network') {
+    const url = getAppUrl();
+    const netEl = document.getElementById('netUrlText');
+    if (netEl) netEl.textContent = url;
+    drawQRCode(url);
+  }
+}
+
+function copyNetworkUrl() {
+  const text = document.getElementById('netUrlText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Network Link Copied to Clipboard!');
+  }).catch(() => {
+    showToast('Link: ' + text);
+  });
+}
+
+// Lightweight Standalone QR Code Canvas Renderer
+function drawQRCode(url) {
+  const canvas = document.getElementById('qrCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const size = 160;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, size, size);
+
+  // Generate a high-contrast clean finder pattern and matrix
+  ctx.fillStyle = '#000000';
+  const drawFinder = (x, y) => {
+    ctx.fillRect(x, y, 35, 35);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x + 5, y + 5, 25, 25);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x + 10, y + 10, 15, 15);
+  };
+
+  drawFinder(10, 10);
+  drawFinder(size - 45, 10);
+  drawFinder(10, size - 45);
+
+  // Pattern data based on URL hash
+  let hash = 0;
+  for (let i = 0; i < url.length; i++) {
+    hash = (hash << 5) - hash + url.charCodeAt(i);
+    hash |= 0;
+  }
+
+  const cellSize = 5;
+  for (let r = 0; r < 24; r++) {
+    for (let c = 0; c < 24; c++) {
+      const px = 20 + c * cellSize;
+      const py = 20 + r * cellSize;
+      if ((px < 50 && py < 50) || (px > 110 && py < 50) || (px < 50 && py > 110)) continue;
+      
+      const pseudoVal = Math.sin(hash + r * 17 + c * 31);
+      if (pseudoVal > 0.1 || (r % 2 === 0 && c % 3 === 0)) {
+        ctx.fillRect(px, py, cellSize - 0.5, cellSize - 0.5);
+      }
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   THEME SYSTEM
+══════════════════════════════════════════════════════════════════ */
+function toggleThemeDrawer() {
+  DOM.themeDrawer.classList.toggle('open');
+}
+
+function selectTheme(themeName) {
+  STATE.activeTheme = themeName;
+  document.documentElement.setAttribute('data-theme', themeName);
+  localStorage.setItem('forge_theme', themeName);
+
+  document.querySelectorAll('.theme-opt').forEach(btn => {
+    const isMatched = btn.getAttribute('onclick')?.includes(themeName);
+    btn.classList.toggle('selected', !!isMatched);
+  });
+
+  DOM.themeDrawer.classList.remove('open');
+  renderUI();
+}
+
+document.addEventListener('click', e => {
+  if (!DOM.themeDrawer.contains(e.target) && !document.getElementById('btnThemeToggle').contains(e.target)) {
+    DOM.themeDrawer.classList.remove('open');
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════════════════ */
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+function toggleAudio() {
+  isAudioEnabled = !isAudioEnabled;
+  DOM.btnAudioToggle.classList.toggle('muted', !isAudioEnabled);
+  DOM.btnAudioToggle.classList.toggle('active', !isAudioEnabled);
+}
+
+function toggleConfigDeck() {
+  DOM.deckBody.classList.toggle('open');
+  DOM.deckChevron.classList.toggle('expanded');
+}
+
+function showToast(message) {
+  DOM.toastMsg.textContent = message;
+  DOM.toastMsg.classList.add('show');
+  setTimeout(() => DOM.toastMsg.classList.remove('show'), 4000);
+}
+
+document.addEventListener('keydown', e => {
+  if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+  if (e.code === 'Space') { e.preventDefault(); handleTogglePlay(); }
+  if (e.key === 'r' || e.key === 'R') handleReset();
+  if (e.key === 's' || e.key === 'S') handleSkip();
+  if (e.key === 'm' || e.key === 'M') toggleAudio();
+  if (e.key === 't' || e.key === 'T') {
+    const themes = ['jet-black', 'peach-white', 'cyber-neon', 'nebula-violet', 'titanium-raw'];
+    const nextIdx = (themes.indexOf(STATE.activeTheme) + 1) % themes.length;
+    selectTheme(themes[nextIdx]);
+  }
+});
+
+(function init() {
+  const savedTheme = localStorage.getItem('forge_theme') || 'jet-black';
+  selectTheme(savedTheme);
+  const savedSoundPack = localStorage.getItem('forge_sound_pack') || 'synth';
+  selectSoundPack(savedSoundPack);
+
+  // Restore active or saved config
+  try {
+    const savedConfig = JSON.parse(localStorage.getItem('forge_active_config'));
+    if (savedConfig) {
+      DOM.inpWorkMin.value = savedConfig.wMin || 0;
+      DOM.inpWorkSec.value = savedConfig.wSec !== undefined ? savedConfig.wSec : 20;
+      DOM.inpRestMin.value = savedConfig.rMin || 0;
+      DOM.inpRestSec.value = savedConfig.rSec !== undefined ? savedConfig.rSec : 10;
+      DOM.inpRounds.value = savedConfig.rounds || 8;
+      DOM.inpCountdown.value = savedConfig.prepSec !== undefined ? savedConfig.prepSec : 3;
+      STATE.activePresetId = savedConfig.activePresetId || 'tabata';
+    }
+  } catch (e) {}
+
+  renderPresetTrack();
+  readConfigFromUI();
+  renderDots();
+  renderUI();
+})();
+</script>
+</body>
+</html>
