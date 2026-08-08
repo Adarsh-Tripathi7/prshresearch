@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="jet-black">
+<html lang="en" data-theme="titanium-raw">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>FORGE PRO — High Performance Interval Trainer</title>
-  <meta name="description" content="FORGE PRO — Elite interval timer with luxury chronograph dial, OLED Jet Black and Peach White themes, and studio-grade acoustic cues."/>
+  <meta name="description" content="FORGE PRO — Elite interval timer with luxury chronograph dial, Titanium Raw and OLED themes, acoustic cues, and notification bar controls."/>
   
   <!-- PWA & Mobile Web App Meta -->
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#000000"/>
+  <meta name="theme-color" content="#0A0B0E"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -1204,6 +1204,147 @@ body.ph-done::before {
   color: var(--text-1);
 }
 
+/* Sleek Hardware Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--bg-inset);
+  border: 1px solid var(--border-strong);
+  transition: .25s var(--ease-smooth);
+  border-radius: 22px;
+}
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-3);
+  transition: .25s var(--ease-smooth);
+  border-radius: 50%;
+}
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--work-primary);
+  border-color: var(--work-primary);
+  box-shadow: 0 0 10px var(--work-glow);
+}
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(16px);
+  background-color: var(--badge-text);
+}
+
+/* Performance Stats & Activity Grid */
+.stats-card {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.stats-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stats-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.stats-streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--work-primary);
+  background: var(--work-ambient);
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--work-glow);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.stat-metric-box {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+}
+.stat-metric-val {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-1);
+}
+.stat-metric-lbl {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+.activity-streak-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  padding: 8px 12px;
+}
+.activity-streak-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+.activity-dots-group {
+  display: flex;
+  gap: 5px;
+}
+.activity-day-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: var(--text-3);
+  transition: all 0.2s;
+}
+.activity-day-dot.active {
+  background: var(--done-primary);
+  border-color: var(--done-primary);
+  color: #000000;
+  box-shadow: 0 0 8px var(--done-glow);
+}
+
 /* Keyboard hint footer */
 .keyboard-bar {
   text-align: center;
@@ -1753,6 +1894,66 @@ kbd {
           <button class="audio-audition-pill" onclick="testAudioCue()">Audition Tone</button>
         </div>
 
+        <!-- Row 7: Voice Coach Toggle -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-3)">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            <span class="row-label" style="font-size:0.82rem;">Voice Coach</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="chkVoiceCoach" checked onchange="toggleVoiceCoach(this.checked)"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- Row 8: Mobile Haptic Feedback -->
+        <div class="config-row-item">
+          <div class="row-label-group">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-3)">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+            <span class="row-label" style="font-size:0.82rem;">Tactile Haptics</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="chkHaptics" checked onchange="toggleHaptics(this.checked)"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- Performance Stats & Consistency Tracker -->
+        <div class="stats-card">
+          <div class="stats-header-row">
+            <span class="stats-title">Performance Analytics</span>
+            <div class="stats-streak-badge" id="statsStreakBadge">⚡ 1 Day Streak</div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-metric-box">
+              <span class="stat-metric-val" id="statTotalWorkouts">0</span>
+              <span class="stat-metric-lbl">Workouts</span>
+            </div>
+            <div class="stat-metric-box">
+              <span class="stat-metric-val" id="statTotalTime">0m</span>
+              <span class="stat-metric-lbl">Total Time</span>
+            </div>
+            <div class="stat-metric-box">
+              <span class="stat-metric-val" id="statBestStreak">0</span>
+              <span class="stat-metric-lbl">Best Streak</span>
+            </div>
+          </div>
+          <div class="activity-streak-row">
+            <span class="activity-streak-label">7-Day Consistency</span>
+            <div class="activity-dots-group" id="activityDotsGroup">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2019,10 +2220,112 @@ function releaseWakeLock() {
 /* ══════════════════════════════════════════════════════════════════
    HAPTIC TACTILE VIBRATION ENGINE (MOBILE PHYSICAL FEEDBACK)
 ══════════════════════════════════════════════════════════════════ */
+let isHapticsEnabled = true;
+
 function triggerHaptic(pattern = [40]) {
-  if ('vibrate' in navigator) {
+  if (isHapticsEnabled && 'vibrate' in navigator) {
     try { navigator.vibrate(pattern); } catch (e) {}
   }
+}
+
+function toggleHaptics(enabled) {
+  isHapticsEnabled = enabled;
+  localStorage.setItem('forge_haptics_enabled', enabled ? '1' : '0');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VOICE COACH / ANNOUNCER (SPEECH SYNTHESIS ENGINE)
+══════════════════════════════════════════════════════════════════ */
+let isVoiceEnabled = true;
+
+function speakVoice(text, priority = false) {
+  if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
+  try {
+    if (priority) window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.05;
+    utterance.pitch = 1.0;
+    utterance.volume = 0.95;
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => (v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Natural'))));
+    if (preferredVoice) utterance.voice = preferredVoice;
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {}
+}
+
+function toggleVoiceCoach(enabled) {
+  isVoiceEnabled = enabled;
+  localStorage.setItem('forge_voice_enabled', enabled ? '1' : '0');
+  if (enabled) speakVoice('Voice Coach activated');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PHONE NOTIFICATION BAR & LOCK SCREEN CONTROLS (MEDIA SESSION API)
+══════════════════════════════════════════════════════════════════ */
+let silentAudioNode = null;
+
+function initMediaSession() {
+  if (!('mediaSession' in navigator)) return;
+
+  try {
+    navigator.mediaSession.setActionHandler('play', () => {
+      if (!STATE.isRunning) handleTogglePlay();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      if (STATE.isRunning) handleTogglePlay();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      handleSkip();
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      handleReset();
+    });
+  } catch (e) {}
+}
+
+function startSilentKeepAlive() {
+  try {
+    const ctx = getAudioContext();
+    if (!silentAudioNode) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.0001; // Silent carrier
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      silentAudioNode = { osc, gain };
+    }
+  } catch (e) {}
+}
+
+function stopSilentKeepAlive() {
+  if (silentAudioNode) {
+    try {
+      silentAudioNode.osc.stop();
+      silentAudioNode.osc.disconnect();
+    } catch (e) {}
+    silentAudioNode = null;
+  }
+}
+
+function updateMediaSession() {
+  if (!('mediaSession' in navigator)) return;
+
+  const phaseLabel = STATE.phase === 'work' ? `Round ${STATE.currentRound}/${STATE.totalRounds} — WORK` : (STATE.phase === 'rest' ? `Round ${STATE.currentRound}/${STATE.totalRounds} — REST` : (STATE.phase === 'countdown' ? 'GET READY' : 'FORGE PRO'));
+  const currentSec = Math.max(0, Math.ceil(STATE.remainingMs / 1000));
+  const timeFormatted = `${String(Math.floor(currentSec / 60)).padStart(2, '0')}:${String(currentSec % 60).padStart(2, '0')}`;
+
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: phaseLabel,
+    artist: `${timeFormatted} remaining · FORGE PRO`,
+    album: 'High Performance Interval Trainer',
+    artwork: [
+      { src: 'icon-192.svg', sizes: '192x192', type: 'image/svg+xml' },
+      { src: 'icon-512.svg', sizes: '512x512', type: 'image/svg+xml' }
+    ]
+  });
+
+  navigator.mediaSession.playbackState = STATE.isRunning ? 'playing' : 'paused';
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -2395,16 +2698,27 @@ function ticker(now) {
     }
   }
 
+  // Check Halfway Announcement (for rounds >= 20s)
+  if (STATE.phase === 'work' && STATE.workDurationMs >= 20000 && !STATE.halfwayAnnounced) {
+    if (STATE.remainingMs <= (STATE.workDurationMs / 2)) {
+      STATE.halfwayAnnounced = true;
+      speakVoice('Halfway there');
+    }
+  }
+
   if (STATE.remainingMs <= 0) {
     advancePhase(-STATE.remainingMs);
     return;
   }
 
   renderUI();
+  updateMediaSession();
   STATE.rafId = requestAnimationFrame(ticker);
 }
 
 function advancePhase(overflowMs = 0) {
+  STATE.halfwayAnnounced = false;
+
   if (STATE.phase === 'countdown') {
     STATE.phase = 'work';
     STATE.currentRound = 1;
@@ -2412,22 +2726,28 @@ function advancePhase(overflowMs = 0) {
     STATE.lastTriggeredSec = -1;
     SoundEffects.workStart();
     triggerHaptic([90, 40, 140]);
+    speakVoice('Round 1, Go!');
   } else if (STATE.phase === 'work') {
     STATE.phase = 'rest';
     STATE.remainingMs = STATE.restDurationMs - overflowMs;
     STATE.lastTriggeredSec = -1;
     SoundEffects.restStart();
     triggerHaptic([60, 30, 60]);
+    speakVoice('Rest');
   } else if (STATE.phase === 'rest') {
     if (STATE.currentRound >= STATE.totalRounds) {
       STATE.phase = 'done';
       STATE.isRunning = false;
       STATE.remainingMs = 0;
       releaseWakeLock();
+      stopSilentKeepAlive();
       SoundEffects.sessionComplete();
       triggerHaptic([100, 50, 100, 50, 200]);
+      speakVoice('Workout complete! Outstanding effort!');
+      recordWorkoutCompletion();
       showToast('Session Complete — Outstanding Workout');
       renderUI();
+      updateMediaSession();
       return;
     }
     STATE.currentRound++;
@@ -2436,9 +2756,15 @@ function advancePhase(overflowMs = 0) {
     STATE.lastTriggeredSec = -1;
     SoundEffects.workStart();
     triggerHaptic([90, 40, 140]);
+    if (STATE.currentRound === STATE.totalRounds) {
+      speakVoice('Final round, push it!');
+    } else {
+      speakVoice('Round ' + STATE.currentRound + ', Go!');
+    }
   }
 
   renderUI();
+  updateMediaSession();
   STATE.lastTimestamp = performance.now();
   STATE.rafId = requestAnimationFrame(ticker);
 }
@@ -2456,15 +2782,19 @@ function handleTogglePlay() {
 
   if (!STATE.isRunning) {
     requestWakeLock();
+    startSilentKeepAlive();
     if (STATE.phase === 'idle') {
       readConfigFromUI();
+      STATE.halfwayAnnounced = false;
       if (STATE.countdownDurationMs > 0) {
         STATE.phase = 'countdown';
         STATE.remainingMs = STATE.countdownDurationMs;
+        speakVoice('Get ready');
       } else {
         STATE.phase = 'work';
         STATE.currentRound = 1;
         STATE.remainingMs = STATE.workDurationMs;
+        speakVoice('Round 1, Go!');
       }
       STATE.lastTriggeredSec = -1;
       SoundEffects.countdownStart();
@@ -2475,10 +2805,12 @@ function handleTogglePlay() {
   } else {
     STATE.isRunning = false;
     releaseWakeLock();
+    stopSilentKeepAlive();
     cancelAnimationFrame(STATE.rafId);
     STATE.lastTriggeredSec = -1;
   }
   renderUI();
+  updateMediaSession();
 }
 
 function handleSkip() {
@@ -2491,14 +2823,107 @@ function handleSkip() {
 function handleReset() {
   STATE.isRunning = false;
   releaseWakeLock();
+  stopSilentKeepAlive();
   cancelAnimationFrame(STATE.rafId);
   STATE.phase = 'idle';
   STATE.currentRound = 0;
   STATE.remainingMs = 0;
   STATE.elapsedMs = 0;
   STATE.lastTriggeredSec = -1;
+  STATE.halfwayAnnounced = false;
   updateDial(1, true);
   renderUI();
+  updateMediaSession();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PERFORMANCE STATS & ACTIVITY TRACKER ENGINE
+══════════════════════════════════════════════════════════════════ */
+function getWorkoutStats() {
+  try {
+    return JSON.parse(localStorage.getItem('forge_workout_stats')) || {
+      totalWorkouts: 0,
+      totalSeconds: 0,
+      currentStreak: 0,
+      bestStreak: 0,
+      lastWorkoutDate: ''
+    };
+  } catch (e) {
+    return { totalWorkouts: 0, totalSeconds: 0, currentStreak: 0, bestStreak: 0, lastWorkoutDate: '' };
+  }
+}
+
+function recordWorkoutCompletion() {
+  const stats = getWorkoutStats();
+  const today = new Date().toISOString().split('T')[0];
+
+  stats.totalWorkouts++;
+  stats.totalSeconds += Math.floor(STATE.elapsedMs / 1000);
+
+  if (stats.lastWorkoutDate) {
+    const lastDate = new Date(stats.lastWorkoutDate);
+    const currentDate = new Date(today);
+    const diffDays = Math.round((currentDate - lastDate) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) {
+      stats.currentStreak++;
+    } else if (diffDays > 1) {
+      stats.currentStreak = 1;
+    }
+  } else {
+    stats.currentStreak = 1;
+  }
+
+  stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+  stats.lastWorkoutDate = today;
+
+  try {
+    localStorage.setItem('forge_workout_stats', JSON.stringify(stats));
+    const historyDays = JSON.parse(localStorage.getItem('forge_active_dates')) || [];
+    if (!historyDays.includes(today)) {
+      historyDays.push(today);
+      localStorage.setItem('forge_active_dates', JSON.stringify(historyDays));
+    }
+  } catch (e) {}
+
+  renderStats();
+}
+
+function renderStats() {
+  const stats = getWorkoutStats();
+  const totalMins = Math.floor(stats.totalSeconds / 60);
+
+  const elWorkouts = document.getElementById('statTotalWorkouts');
+  const elTime = document.getElementById('statTotalTime');
+  const elBest = document.getElementById('statBestStreak');
+  const elStreakBadge = document.getElementById('statsStreakBadge');
+  const elDotsGroup = document.getElementById('activityDotsGroup');
+
+  if (elWorkouts) elWorkouts.textContent = stats.totalWorkouts;
+  if (elTime) elTime.textContent = totalMins >= 60 ? `${Math.floor(totalMins / 60)}h ${totalMins % 60}m` : `${totalMins}m`;
+  if (elBest) elBest.textContent = stats.bestStreak;
+  if (elStreakBadge) elStreakBadge.textContent = `⚡ ${stats.currentStreak} Day${stats.currentStreak === 1 ? '' : 's'}`;
+
+  if (elDotsGroup) {
+    elDotsGroup.innerHTML = '';
+    const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const activeDates = JSON.parse(localStorage.getItem('forge_active_dates') || '[]');
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const dayName = days[(d.getDay() + 6) % 7];
+      const isActive = activeDates.includes(dateStr);
+
+      const dot = document.createElement('div');
+      dot.className = `activity-day-dot ${isActive ? 'active' : ''}`;
+      dot.textContent = dayName;
+      dot.title = dateStr;
+      elDotsGroup.appendChild(dot);
+    }
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -2773,10 +3198,22 @@ document.addEventListener('keydown', e => {
 });
 
 (function init() {
-  const savedTheme = localStorage.getItem('forge_theme') || 'jet-black';
+  const savedTheme = localStorage.getItem('forge_theme') || 'titanium-raw';
   selectTheme(savedTheme);
   const savedSoundPack = localStorage.getItem('forge_sound_pack') || 'synth';
   selectSoundPack(savedSoundPack);
+
+  // Restore Voice & Haptic preferences
+  isVoiceEnabled = localStorage.getItem('forge_voice_enabled') !== '0';
+  const chkVoice = document.getElementById('chkVoiceCoach');
+  if (chkVoice) chkVoice.checked = isVoiceEnabled;
+
+  isHapticsEnabled = localStorage.getItem('forge_haptics_enabled') !== '0';
+  const chkHap = document.getElementById('chkHaptics');
+  if (chkHap) chkHap.checked = isHapticsEnabled;
+
+  initMediaSession();
+  renderStats();
 
   // Restore active or saved config
   try {

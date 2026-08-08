@@ -1,17 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="112" fill="#000000"/>
+  <!-- Titanium Raw Dark Canvas -->
+  <rect width="512" height="512" rx="118" fill="#0A0B0E"/>
   <defs>
-    <linearGradient id="forgeGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF5A26"/>
-      <stop offset="50%" stop-color="#FF2A00"/>
-      <stop offset="100%" stop-color="#FF8F50"/>
+    <!-- Brushed Titanium Gradient -->
+    <linearGradient id="titaniumMetal512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="35%" stop-color="#E2E8F0"/>
+      <stop offset="70%" stop-color="#94A3B8"/>
+      <stop offset="100%" stop-color="#475569"/>
     </linearGradient>
-    <filter id="shadow512" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#FF5A26" flood-opacity="0.45"/>
+    <linearGradient id="titaniumCore512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="50%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="titaniumGlow512" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#FFFFFF" flood-opacity="0.35"/>
     </filter>
   </defs>
-  <rect x="64" y="64" width="384" height="384" rx="96" fill="url(#forgeGrad512)" filter="url(#shadow512)"/>
-  <!-- Vector Shield & Lightning Bolt -->
-  <path d="M256 124L144 180V314L256 380L368 314V180L256 124Z" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" fill="none" opacity="0.95"/>
-  <path d="M256 172L192 258H262L240 338L320 248H250L256 172Z" fill="#FFD166" opacity="0.98"/>
+  
+  <!-- Outer Bezel -->
+  <rect x="58" y="58" width="396" height="396" rx="96" fill="url(#titaniumCore512)" stroke="url(#titaniumMetal512)" stroke-width="6"/>
+  
+  <!-- Aerospace Shield -->
+  <path d="M256 118L138 176V315L256 384L374 315V176L256 118Z" stroke="url(#titaniumMetal512)" stroke-width="16" stroke-linejoin="round" fill="none" opacity="0.95"/>
+  
+  <!-- Titanium Lightning Crest -->
+  <path d="M256 166L186 256H262L240 342L326 246H252L256 166Z" fill="url(#titaniumMetal512)" filter="url(#titaniumGlow512)"/>
 </svg>
