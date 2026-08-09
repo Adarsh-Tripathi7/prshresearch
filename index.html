@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Prsh Capital | Research Hub</title>
+<meta name="description" content="Prsh Capital Research Hub. Advanced quantitative analysis, probability models, and market extension matrices for NQ and ES futures.">
+<meta name="keywords" content="Prsh Capital, Quantitative Research, Trading, NQ, ES, Futures, Probability Models, Extension Matrix">
+<meta property="og:title" content="Prsh Capital | Research Hub">
+<meta property="og:description" content="Advanced quantitative analysis and probability models for NQ and ES futures.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://prshcapital.netlify.app/">
+<meta property="og:image" content="https://prshcapital.netlify.app/screenshot-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://prshcapital.netlify.app/screenshot-wide.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=3">
+<link rel="icon" type="image/svg+xml" href="icon.svg?v=4">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #000000; 
+  --bg-card: #0a0a0a;
+  --bg-hover: #141414;
+  --border: #1f1f1f;
+  --border-hover: #333333;
+  --text-1: #ffffff;
+  --text-2: #888888;
+  --text-3: #555555;
+  --accent: #6366f1;
+  --accent-dim: rgba(99,102,241,0.15);
+  --spring: cubic-bezier(0.25, 1, 0.5, 1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+    color: var(--text-1); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* ACCESSIBILITY & FOCUS */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.search-box input:focus-visible { outline: none; }
+.nav-brand { text-decoration: none; color: inherit; transition: opacity 0.2s; }
+.nav-brand:hover { opacity: 0.8; }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes pulseGlow {
+    0% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
+    100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+}
+.animate-up { opacity: 0; animation: fadeUp 0.6s var(--spring) forwards; }
+.animate-fade { opacity: 0; animation: fadeIn 1s ease forwards; }
+
+/* NAVBAR */
+.navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(20px) saturate(1.5);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; letter-spacing: -0.3px; }
+.nav-brand svg { width: 20px; height: 20px; color: var(--text-1); }
+
+.nav-actions { display: flex; gap: 12px; align-items: center; flex: 1; justify-content: flex-end; max-width: 500px; }
+.search-box {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    display: flex; align-items: center; padding: 6px 12px; gap: 8px; flex: 1;
+    transition: border 0.3s var(--spring), box-shadow 0.3s var(--spring);
+}
+.search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.search-box input { background: transparent; border: none; color: var(--text-1); outline: none; font-size: 14px; width: 100%; }
+.search-box input::placeholder { color: var(--text-3); }
+.search-box svg { color: var(--text-2); width: 14px; height: 14px; }
+.search-kbd {
+    font-size: 10px; background: var(--border); color: var(--text-2);
+    padding: 2px 6px; border-radius: 4px; font-weight: 600; border: 1px solid var(--border-hover);
+}
+
+select.dropdown {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text-1); padding: 8px 12px; font-size: 13px; font-family: inherit;
+    outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='3 5 6 8 9 5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+}
+select.dropdown:focus { border-color: var(--border-hover); }
+
+/* HERO */
+.hero { position: relative; padding: 80px 24px 60px; text-align: center; overflow: hidden; }
+.glow {
+    position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse at center, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 60%);
+    pointer-events: none; z-index: 0;
+    animation: pulseGlow 8s ease-in-out infinite;
+}
+.hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+.badge { 
+    display: inline-block; background: var(--bg-card); border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    color: var(--text-2); margin-bottom: 24px; letter-spacing: 0.5px;
+}
+.hero h1 { 
+    font-size: 48px; font-weight: 700; margin-bottom: 16px; letter-spacing: -2px; line-height: 1.1;
+    background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p { color: var(--text-2); font-size: 18px; max-width: 500px; margin: 0 auto; line-height: 1.5; }
+
+/* MAIN CONTENT */
+.container { max-width: 1000px; margin: 0 auto; padding: 0 24px 80px; width: 100%; }
+.section-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+
+/* GRID */
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* CARDS */
+.nav-card { 
+  display: flex; align-items: flex-start; background: var(--bg-card); padding: 20px; 
+  border-radius: 16px; border: 1px solid var(--border); text-decoration: none; color: inherit;
+  transition: transform 0.3s var(--spring), border-color 0.3s, background 0.3s, box-shadow 0.3s;
+}
+.nav-card:hover { 
+    border-color: var(--border-hover); background: rgba(20,20,20,0.8);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.1);
+    transform: translateY(-2px);
+}
+.nav-card:active { transform: translateY(0) scale(0.98); background: var(--bg-hover); }
+.nav-icon-wrap { 
+    background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%);
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; 
+    border-radius: 10px; margin-right: 16px; border: 1px solid rgba(99,102,241,0.2);
+    color: var(--accent); flex-shrink: 0;
+}
+.nav-icon-wrap svg { width: 20px; height: 20px; }
+.nav-info { flex: 1; }
+.nav-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.nav-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+.nav-badge { background: var(--border); padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-2); }
+.nav-sub { font-size: 13px; color: var(--text-2); line-height: 1.4; }
+.nav-arrow { color: var(--border-hover); display: flex; align-items: center; height: 40px; }
+.nav-arrow svg { width: 18px; height: 18px; transition: color 0.2s, transform 0.2s var(--spring); }
+.nav-card:hover .nav-arrow svg { color: var(--text-1); transform: translateX(4px); }
+
+.empty-state { text-align: center; padding: 40px; color: var(--text-3); font-size: 14px; display: none; grid-column: 1 / -1; }
+
+@media (max-width: 600px) {
+    .navbar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+    .nav-actions { max-width: none; }
+    .hero h1 { font-size: 36px; }
+    .hero { padding: 40px 16px; }
+    .search-kbd { display: none; }
+}
+
+:root[data-theme='light'] {
+  --bg: #fdfbf7;
+  --bg-card: #ffffff;
+  --bg-hover: #f4f1ea;
+  --border: #e8e4dc;
+  --border-hover: #d6d1c6;
+  --text-1: #0f172a;
+  --text-2: #475569;
+  --text-3: #64748b;
+  --accent: #4f46e5;
+  --accent-dim: rgba(79,102,229,0.15);
+}
+:root[data-theme='light'] .navbar { background: rgba(255,255,255,0.85); border-bottom: 1px solid var(--border); }
+:root[data-theme='light'] .hero h1 { background: linear-gradient(180deg, #0f172a 0%, #475569 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+:root[data-theme='light'] .nav-card:hover { background: #fdfbf7; box-shadow: 0 8px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(99,102,241,0.1); }
+:root[data-theme='light'] .search-kbd { background: #e8e4dc; color: #475569; border-color: #d6d1c6; }
+:root[data-theme='light'] .vault-modal { background: #ffffff; border-color: #e8e4dc; }
+:root[data-theme='light'] .admin-modal { background: #ffffff; border-color: #e8e4dc; }
+:root[data-theme='light'] .admin-title, :root[data-theme='light'] .vault-modal h2 { color: #0f172a; }
+:root[data-theme='light'] .admin-sub, :root[data-theme='light'] .vault-modal p { color: #475569; }
+:root:not([data-theme='light']) #themeIconSun { display: block !important; }
+:root[data-theme='light'] #themeIconMoon { display: block !important; }
+</style>
+<script>
+(function(){
+    var theme = localStorage.getItem("theme");
+    if(theme === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+    }
+})();
+</script>
+</head>
+<body>
+    
+    <nav class="navbar animate-fade" style="animation-delay: 0.1s">
+        <a href="index.html" class="nav-brand" aria-label="Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            Prsh Capital
+        </a>
+        <div class="nav-actions">
+            <button id="themeToggleBtn" style="background:transparent; border:none; cursor:pointer; color:var(--text-2); margin-right:8px; margin-left:8px; display:flex; align-items:center; justify-content:center; padding:4px; transition:color 0.2s;" onmouseover="this.style.color='var(--text-1)'" onmouseout="this.style.color='var(--text-2)'" title="Toggle Theme">
+    <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+</button>
+            <button id="installAppBtn" style="display:none; background:var(--accent); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; box-shadow: 0 4px 12px rgba(99,102,241,0.3); transition:all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Install App</button>
+            <select class="dropdown" id="filterCategory" aria-label="Filter category">
+                <option value="all">All Research</option>
+                <option value="time-range">Time Range</option>
+                <option value="market-stats">Market Stats</option>
+            </select>
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="searchInput" placeholder="Search dashboards...">
+                <div class="search-kbd">/</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="glow"></div>
+        <div class="hero-content">
+            <div class="badge animate-up" style="animation-delay: 0.1s">Research Hub</div>
+            <h1 class="animate-up" style="animation-delay: 0.15s">Explore quantitative<br>insights & data.</h1>
+            <p class="animate-up" style="animation-delay: 0.2s">Access interactive probability matrices, R-multiple extensions, and heatmap correlations across NQ and ES.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-title animate-up" style="animation-delay: 0.25s">
+            <span>Dashboards</span>
+            <span id="resultCount" style="font-size:13px; color:var(--text-2); font-weight:400;">10 results</span>
+        </div>
+        <div class="grid" id="cardGrid">
+        <a href="pdr_analysis.html" class="nav-card animate-up" style="animation-delay: 0.25s" data-title="pdr & pwr analysis" data-category="market-stats" data-type="stats">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">PDR Stats (Daily)</span>
+                    <span class="nav-badge">Stats</span>
+                </div>
+                <div class="nav-sub">Previous Day Range breaks and correlation</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+            
+        <a href="pwr_analysis.html" class="nav-card animate-up" style="animation-delay: 0.28s" data-title="pwr analysis" data-category="market-stats" data-type="stats">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">PWR Stats (Weekly)</span>
+                    <span class="nav-badge" style="background:rgba(234,179,8,0.1); color:#eab308">Stats</span>
+                </div>
+                <div class="nav-sub">Previous Week Range extensions and decay</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+            
+        <a href="dashboard.html?tf=time_range_10m&bust=1" class="nav-card animate-up" style="animation-delay: 0.3s" data-title="10m" data-category="time-range" data-type="standard">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">10M</span>
+                    <span class="nav-badge">Standard</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_120m&bust=1" class="nav-card animate-up" style="animation-delay: 0.35s" data-title="120m" data-category="time-range" data-type="standard">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">120M</span>
+                    <span class="nav-badge">Standard</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_15m&bust=1" class="nav-card animate-up" style="animation-delay: 0.4s" data-title="15m" data-category="time-range" data-type="standard">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">15M</span>
+                    <span class="nav-badge">Standard</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_15m_step&bust=1" class="nav-card animate-up" style="animation-delay: 0.45s" data-title="15m step" data-category="time-range" data-type="step">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">15M STEP</span>
+                    <span class="nav-badge">Step</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_30m&bust=1" class="nav-card animate-up" style="animation-delay: 0.5s" data-title="30m" data-category="time-range" data-type="standard">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">30M</span>
+                    <span class="nav-badge">Standard</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_30m_15m_step&bust=1" class="nav-card animate-up" style="animation-delay: 0.55s" data-title="30m / 15m step" data-category="time-range" data-type="step">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">30M / 15M STEP</span>
+                    <span class="nav-badge">Step</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_45m&bust=1" class="nav-card animate-up" style="animation-delay: 0.6000000000000001s" data-title="45m" data-category="time-range" data-type="standard">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">45M</span>
+                    <span class="nav-badge">Standard</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_60m&bust=1" class="nav-card animate-up" style="animation-delay: 0.65s" data-title="60m" data-category="time-range" data-type="standard">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">60M</span>
+                    <span class="nav-badge">Standard</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_7m&bust=1" class="nav-card animate-up" style="animation-delay: 0.7s" data-title="7m" data-category="time-range" data-type="standard">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">7M</span>
+                    <span class="nav-badge">Standard</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+        <a href="dashboard.html?tf=time_range_7m_1m_step&bust=1" class="nav-card animate-up" style="animation-delay: 0.75s" data-title="7m / 1m step" data-category="time-range" data-type="step">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div class="nav-info">
+                <div class="nav-title-row">
+                    <span class="nav-title">7M / 1M STEP</span>
+                    <span class="nav-badge">Step</span>
+                </div>
+                <div class="nav-sub">Interactive probability and extension matrix</div>
+            </div>
+            <div class="nav-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+            <div class="empty-state" id="emptyState">No dashboards found matching your criteria.</div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const filterCategory = document.getElementById('filterCategory');
+        const cards = document.querySelectorAll('.nav-card');
+        const emptyState = document.getElementById('emptyState');
+        const resultCount = document.getElementById('resultCount');
+
+        // Keyboard accessibility for search
+
+
+        function filterCards() {
+            const query = searchInput.value.toLowerCase().trim();
+            const category = filterCategory.value;
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const cardCat = card.getAttribute('data-category');
+                
+                const matchesSearch = title.includes(query);
+                const matchesCategory = category === 'all' || cardCat === category;
+
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+            resultCount.textContent = visibleCount + ' results';
+        }
+
+        searchInput.addEventListener('input', filterCards);
+        filterCategory.addEventListener('change', filterCards);
+    </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const installBtn = document.getElementById('installAppBtn');
+  if (installBtn) {
+    installBtn.style.display = 'block';
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      deferredPrompt = null;
+    });
+  }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var toggleBtn = document.getElementById("themeToggleBtn");
+    if(toggleBtn) {
+        toggleBtn.addEventListener("click", function() {
+            var isLight = document.documentElement.getAttribute("data-theme") === "light";
+            if(isLight) {
+                document.documentElement.removeAttribute("data-theme");
+                localStorage.setItem("theme", "dark");
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                localStorage.setItem("theme", "light");
+            }
+            if(window.echarts) {
+                location.reload();
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>
