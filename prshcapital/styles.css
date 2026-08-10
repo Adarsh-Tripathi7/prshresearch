@@ -199,4 +199,10 @@ tr.clickable:active { background: rgba(255,255,255,0.05); }
 .cd-item:hover { background: rgba(255,255,255,0.05); color: var(--text-1); }
 .cd-item.active { background: rgba(99, 102, 241, 0.15); color: var(--accent); }
 
+/* Mobile responsive table fixes */
+@media (max-width: 767px) {
+  th { padding: 8px 6px; font-size: 10px; }
+  td { padding: 8px 6px; font-size: 11px; }
+  .c-mono { font-size: 10px; }
+}
 
