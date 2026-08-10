@@ -1,17 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#6366f1" />
-      <stop offset="100%" stop-color="#a855f7" />
-    </linearGradient>
-    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#e2e8f0" />
-    </linearGradient>
-  </defs>
-  <rect width="256" height="256" rx="60" fill="url(#g)" />
-  <path d="M 128 48 L 208 92 L 208 164 L 128 208 L 48 164 L 48 92 Z" fill="rgba(255,255,255,0.2)" />
-  <path d="M 48 92 L 128 136 L 208 92" fill="none" stroke="url(#g2)" stroke-width="12" stroke-linejoin="round" />
-  <path d="M 128 136 L 128 208" fill="none" stroke="url(#g2)" stroke-width="12" stroke-linecap="round" />
-  <path d="M 128 48 L 208 92 L 208 164 L 128 208 L 48 164 L 48 92 Z" fill="none" stroke="url(#g2)" stroke-width="12" stroke-linejoin="round" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+  <line x1="12" y1="22.08" x2="12" y2="12"></line>
 </svg>

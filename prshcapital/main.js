@@ -47,15 +47,24 @@ window.loadTimeframeData = async function(tf) {
   const loader = $('loader');
   if (loader) loader.classList.add('active');
   try {
-    const res = await fetch(`data/${tf}.json`);
-    window._D = await res.json();
+    const res = await fetch(`data/${tf}.msgpack`);
+    const buffer = await res.arrayBuffer();
+    window._D = MessagePack.decode(buffer);
+    // Convert any BigInt values to Number (msgpack may decode ints as BigInt)
+    (function convertBigInt(obj) {
+      if (Array.isArray(obj)) { for (let i = 0; i < obj.length; i++) { if (typeof obj[i] === 'bigint') obj[i] = Number(obj[i]); else if (typeof obj[i] === 'object' && obj[i] !== null) convertBigInt(obj[i]); } }
+      else if (typeof obj === 'object' && obj !== null) { for (const k in obj) { if (typeof obj[k] === 'bigint') obj[k] = Number(obj[k]); else if (typeof obj[k] === 'object' && obj[k] !== null) convertBigInt(obj[k]); } }
+    })(window._D);
     window.applySessionFilter();
     
     const labelMatch = tf.match(/time_range_(.+)/);
     if (labelMatch && $('timeBadgeBtn')) {
        let lbl = labelMatch[1].toUpperCase().replace(/_1M_STEP/g, ' / 1M STEP').replace(/_15M_STEP/g, ' / 15M STEP');
        $('timeBadgeBtn').innerText = lbl;
-       document.title = 'Prsh Capital | ' + lbl;
+       const activeTabName = localStorage.getItem('prsh_active_tab') || 'overview';
+       const pageTitles = { 'overview': 'Overview', 'probability': 'DB %', 'hl_first': 'H/L First', 'extensions': 'Extensions', 'heatmap': 'Heatmap' };
+       const pgTitle = pageTitles[activeTabName] || activeTabName;
+       document.title = 'Prsh Capital | ' + lbl + ' - ' + pgTitle;
     }
     
     if (typeof updateAllDashboards === 'function') {
@@ -185,6 +194,10 @@ function goTo(name) {
       setTimeout(resizeAll, 50); 
   }
   if ($('spotlight') && $('spotlight').classList.contains('open')) { $('search').dispatchEvent(new Event('input')); }
+  const tfLbl = $('timeBadgeBtn') ? $('timeBadgeBtn').innerText : '';
+  const pageTitles = { 'overview': 'Overview', 'probability': 'DB %', 'hl_first': 'H/L First', 'extensions': 'Extensions', 'heatmap': 'Heatmap' };
+  const pgTitle = pageTitles[name] || name;
+  document.title = tfLbl ? `Prsh Capital | ${tfLbl} - ${pgTitle}` : `Prsh Capital - ${pgTitle}`;
 }
 $$('.nav-btn').forEach(b => b.addEventListener('click', () => goTo(b.dataset.p)));
 $$('#desktopNav button').forEach(b => b.addEventListener('click', () => goTo(b.dataset.p)));
