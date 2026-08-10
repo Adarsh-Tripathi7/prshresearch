@@ -51,8 +51,10 @@ body::before {
   background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px) saturate(1.5);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px;
+  padding: 12px 16px; flex-wrap: wrap; gap: 12px;
 }
+.app-bar > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.app-bar > div:first-child > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .brand { font-family: var(--font-display); font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 4px; letter-spacing: -0.4px; text-decoration: none; color: inherit; transition: opacity 0.2s; }
 .brand:hover { opacity: 0.8; }
 .prsh-logo { width: 18px; height: 18px; color: var(--accent); margin-right: 2px; }
@@ -69,7 +71,7 @@ body::before {
 .search-box {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   display: flex; align-items: center; padding: 6px 12px; gap: 8px;
-  flex: 1; max-width: 300px; margin-left: 16px;
+  flex: 1 1 200px; max-width: 300px; margin-left: auto;
   transition: border 0.3s var(--spring), box-shadow 0.3s var(--spring);
 }
 .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
@@ -147,8 +149,8 @@ tr.clickable:active { background: rgba(255,255,255,0.05); }
 .echart { width: 100%; height: 300px; min-height: 300px; touch-action: pan-x pan-y; } 
 
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(20px) saturate(1.5); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); display: flex; justify-content: space-around; }
-@media (min-width: 768px) { .bottom-nav { display: none; } body { padding-bottom: 0; } .app-bar { padding: 16px 24px; } .desktop-nav { display: flex; gap: 8px; } }
-@media (max-width: 767px) { .desktop-nav { display: none; } }
+@media (min-width: 768px) { .bottom-nav { display: none; } body { padding-bottom: 0; } .app-bar { padding: 16px 24px; flex-wrap: nowrap; } .desktop-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; } }
+@media (max-width: 767px) { .desktop-nav { display: none; } .search-box { max-width: 100%; min-width: 100%; order: 3; margin-top: 8px; margin-left: 0; } }
 .nav-btn { flex: 1; padding: 12px 0; background: transparent; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-3); font-family: var(--font); font-size: 10px; font-weight: 500; cursor: pointer; transition: color 0.2s var(--spring); }
 .nav-btn svg { width: 22px; height: 22px; stroke-width: 2px; }
 .nav-btn.active { color: var(--text-1); }
