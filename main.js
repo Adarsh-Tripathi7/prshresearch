@@ -118,11 +118,45 @@ const $$ = (s, c) => (c || document).querySelectorAll(s);
 
 function initSeg(id, cb) {
   const el = $(id); if (!el) return;
+  
+  if (el.classList.contains('custom-dropdown')) {
+    const trigger = el.querySelector('.cd-trigger');
+    const items = el.querySelectorAll('.cd-item');
+    const valSpan = el.querySelector('.cd-val');
+    
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.custom-dropdown').forEach(d => {
+        if (d !== el) d.classList.remove('open');
+      });
+      el.classList.toggle('open');
+    });
+    
+    items.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        items.forEach(x => x.classList.remove('active'));
+        item.classList.add('active');
+        el.dataset.v = item.dataset.v;
+        valSpan.innerText = item.innerText;
+        el.classList.remove('open');
+        if (cb) cb(item.dataset.v);
+      });
+    });
+    return;
+  }
+
   el.querySelectorAll('button').forEach(b => {
     b.addEventListener('click', () => { el.querySelectorAll('button').forEach(x => x.classList.remove('active')); b.classList.add('active'); if (cb) cb(b.dataset.v); });
   });
 }
-function segVal(id) { const a = $(id)?.querySelector('button.active'); return a ? a.dataset.v : ''; }
+function segVal(id) { 
+  const el = $(id);
+  if (!el) return '';
+  if (el.classList.contains('custom-dropdown')) return el.dataset.v;
+  const a = el.querySelector('button.active'); 
+  return a ? a.dataset.v : ''; 
+}
 
 const charts = {};
 const ro = new ResizeObserver(entries => { requestAnimationFrame(() => { entries.forEach(entry => { const id = entry.target.id; if (charts[id]) charts[id].resize(); }); }); });
