@@ -121,47 +121,53 @@ TEMPLATE = """<!DOCTYPE html>
       <div class="card">
         <div class="card-header">
           <div class="card-title"><div class="dot" style="background:var(--accent)"></div> High / Low Sequence & Close Position Explorer</div>
-          <div class="premium-select-group">
-              <label for="segHlTarget">Sequence</label>
-              <div class="select-wrapper">
-                <select id="segHlTarget">
-              <option value="break_high_first" selected>Break High 1st</option>
-              <option value="break_low_first">Break Low 1st</option>
-              <option value="low_first_break_high">Low 1st → Break High</option>
-              <option value="high_first_break_low">High 1st → Break Low</option>
-              <option value="combined_opp">Combined Opposite</option>
-              <option value="compare_both">Compare High vs Low</option>
-                </select>
-              </div>
-            </div>
-          <div class="premium-select-group">
-              <label for="segClosePosTh">Close</label>
-              <div class="select-wrapper">
-                <select id="segClosePosTh">
-              <option value="none" selected>All Closes</option>
-              <option value="25%">Top/Bot 25%</option>
-              <option value="30%">Top/Bot 30%</option>
-              <option value="35%">Top/Bot 35%</option>
-              <option value="40%">Top/Bot 40%</option>
-              <option value="45%">Top/Bot 45%</option>
-              <option value="50%">Top/Bot 50%</option>
-                </select>
-              </div>
-            </div>
-          <div class="premium-select-group">
-              <label for="segHlSort">Sort By</label>
-              <div class="select-wrapper">
-                <select id="segHlSort">
-              <option value="time" selected>Time</option>
-              <option value="high_desc">High Break % ↓</option>
-              <option value="low_desc">Low Break % ↓</option>
-              <option value="low_first_edge">Low 1st Edge ↓</option>
-              <option value="high_first_edge">High 1st Edge ↓</option>
-              <option value="skew_desc">Direction Skew ↓</option>
-              <option value="count_desc">Samples ↓</option>
-                </select>
-              </div>
-            </div>
+          <div class="custom-dropdown" id="segHlTarget" data-v="break_high_first">
+      <div class="cd-trigger">
+        <span class="cd-label">Sequence:</span>
+        <span class="cd-val">Break High 1st</span>
+        <svg class="cd-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+      </div>
+      <div class="cd-menu">
+      <div class="cd-item active" data-v="break_high_first">Break High 1st</div>
+      <div class="cd-item" data-v="break_low_first">Break Low 1st</div>
+      <div class="cd-item" data-v="low_first_break_high">Low 1st → Break High</div>
+      <div class="cd-item" data-v="high_first_break_low">High 1st → Break Low</div>
+      <div class="cd-item" data-v="combined_opp">Combined Opposite</div>
+      <div class="cd-item" data-v="compare_both">Compare High vs Low</div>
+      </div>
+    </div>
+          <div class="custom-dropdown" id="segClosePosTh" data-v="none">
+      <div class="cd-trigger">
+        <span class="cd-label">Close:</span>
+        <span class="cd-val">All Closes</span>
+        <svg class="cd-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+      </div>
+      <div class="cd-menu">
+      <div class="cd-item active" data-v="none">All Closes</div>
+      <div class="cd-item" data-v="25%">Top/Bot 25%</div>
+      <div class="cd-item" data-v="30%">Top/Bot 30%</div>
+      <div class="cd-item" data-v="35%">Top/Bot 35%</div>
+      <div class="cd-item" data-v="40%">Top/Bot 40%</div>
+      <div class="cd-item" data-v="45%">Top/Bot 45%</div>
+      <div class="cd-item" data-v="50%">Top/Bot 50%</div>
+      </div>
+    </div>
+          <div class="custom-dropdown" id="segHlSort" data-v="time">
+      <div class="cd-trigger">
+        <span class="cd-label">Sort By:</span>
+        <span class="cd-val">Time</span>
+        <svg class="cd-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+      </div>
+      <div class="cd-menu">
+      <div class="cd-item active" data-v="time">Time</div>
+      <div class="cd-item" data-v="high_desc">High Break % ↓</div>
+      <div class="cd-item" data-v="low_desc">Low Break % ↓</div>
+      <div class="cd-item" data-v="low_first_edge">Low 1st Edge ↓</div>
+      <div class="cd-item" data-v="high_first_edge">High 1st Edge ↓</div>
+      <div class="cd-item" data-v="skew_desc">Direction Skew ↓</div>
+      <div class="cd-item" data-v="count_desc">Samples ↓</div>
+      </div>
+    </div>
         </div>
         <div class="card-body"><div id="chartHlFirst" class="echart" style="height:400px"></div></div>
       </div>
