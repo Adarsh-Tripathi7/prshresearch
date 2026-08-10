@@ -1016,13 +1016,7 @@ function updateHeatmap() {
   const c = ec('chartHeatmap'); const dom = c.getDom();
   
   const type = segVal('segHmType'); const dir = segVal('segHmDir');
-  if (type === 'prob') {
-      dom.style.minWidth = '350px';
-  } else if (type === 'corr') {
-      dom.style.minWidth = '500px';
-  } else {
-      dom.style.minWidth = '1400px';
-  }
+  dom.style.minWidth = '';
   
   if (!c._hasSort) {
     c.on('click', function(p) {
@@ -1071,7 +1065,7 @@ function updateHeatmap() {
       c.setOption({
         tooltip: TT, xAxis: { type: 'category', data: [lblNQ, lblES], position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 13, fontWeight: 'bold' }, triggerEvent: true },
         yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-        grid: { top: 40, right: 10, bottom: 10, left: 85 , containLabel: true },
+        grid: { top: 40, right: 10, bottom: 10, left: 0, containLabel: true },
         visualMap: { show: false, min: 20, max: 90, inRange: { color: ['#0f172a', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'] } },
         series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
       }, {replaceMerge: ["series"]});
@@ -1084,7 +1078,7 @@ function updateHeatmap() {
       c.setOption({
         tooltip: TT, xAxis: { type: 'category', data: [lblAsset], position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 13, fontWeight: 'bold' }, triggerEvent: true },
         yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-        grid: { top: 40, right: 10, bottom: 10, left: 85 , containLabel: true },
+        grid: { top: 40, right: 10, bottom: 10, left: 0, containLabel: true },
         visualMap: { show: false, min: 20, max: 90, inRange: { color: ['#0f172a', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'] } },
         series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
       }, {replaceMerge: ["series"]});
@@ -1109,7 +1103,7 @@ function updateHeatmap() {
     c.setOption({
       tooltip: TT, xAxis: { type: 'category', data: cols.map(c=>c.label + sortIndic(c.label)), position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 10, rotate: 30 }, triggerEvent: true },
       yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-      grid: { top: 50, right: 10, bottom: 10, left: 85 , containLabel: true },
+      grid: { top: 50, right: 10, bottom: 10, left: 0, containLabel: true },
       visualMap: { show: false, min: 65, max: 85, inRange: { color: ['#2e1065', '#4c1d95', '#5b21b6', '#6d28d9', '#7c3aed', '#8b5cf6'] } },
       series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' } }]
     }, {replaceMerge: ["series"]});
@@ -1173,7 +1167,11 @@ function updateHeatmap() {
     c.setOption({
       tooltip: TT, xAxis: { type: 'category', data: extLabels.map(p => p + sortIndic(p)), position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 11 }, triggerEvent: true },
       yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-      grid: { top: 40, right: 10, bottom: 10, left: 85 , containLabel: true },
+      grid: { top: 40, right: 10, bottom: 25, left: 0, containLabel: true },
+      dataZoom: [
+        { type: 'inside', xAxisIndex: 0, zoomOnMouseWheel: false, moveOnMouseMove: true, moveOnMouseWheel: true },
+        { type: 'slider', xAxisIndex: 0, height: 12, bottom: 0, borderColor: 'transparent', backgroundColor: 'rgba(255,255,255,0.05)', fillerColor: 'rgba(255,255,255,0.2)', handleStyle: { color: '#fff' }, showDetail: false, start: 0, end: window.innerWidth < 768 ? 40 : 100 }
+      ],
       visualMap: { show: false, min: 1, max: maxV || 5, inRange: { color: ['#022c22', '#064e3b', '#065f46', '#047857', '#059669', '#10b981', '#34d399', '#6ee7b7'] } },
       series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2].toFixed(2) }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
     }, {replaceMerge: ["series"]});
