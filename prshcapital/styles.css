@@ -126,7 +126,7 @@ body::before {
 .segments button.active { background: var(--bg-hover); color: var(--text-1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.4); border: 1px solid var(--border); }
 
 .table-wrap { width: 100%; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-variant-numeric: tabular-nums; }
 th { padding: 10px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-3); font-weight: 600; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); z-index: 2; }
 td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); white-space: nowrap; }
 th:first-child { left: 0; z-index: 3; background: #12121a; }
@@ -134,7 +134,8 @@ td:first-child { position: sticky; left: 0; background: #181825; z-index: 1; bor
 tr:hover td:first-child { background: #1e1e2d; }
 tr.hl td:first-child { background: #1f2138; }
 tr { transition: background 0.2s var(--spring); }
-tr:hover { background: rgba(255,255,255,0.03); }
+tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+tr:hover { background: rgba(255,255,255,0.04); }
 tr.hl { background: var(--accent-dim); }
 tr.clickable:active { background: rgba(255,255,255,0.05); }
 .pct-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-1); }
@@ -190,7 +191,7 @@ tr.clickable:active { background: rgba(255,255,255,0.05); }
 .cd-icon { width: 16px; height: 16px; color: var(--text-2); transition: transform 0.2s var(--spring); }
 .custom-dropdown.open .cd-icon { transform: rotate(180deg); color: var(--accent); }
 
-.cd-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 100%; background: #1a1a24; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.2); padding: 6px; z-index: 100; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s var(--spring); white-space: nowrap; }
+.cd-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 100%; background: rgba(26, 26, 36, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.2); padding: 6px; z-index: 100; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s var(--spring); white-space: nowrap; }
 .custom-dropdown.open .cd-menu { opacity: 1; visibility: visible; transform: translateY(0); }
 .cd-item { padding: 8px 12px; font-size: 13px; color: var(--text-2); font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
 .cd-item:hover { background: rgba(255,255,255,0.05); color: var(--text-1); }
