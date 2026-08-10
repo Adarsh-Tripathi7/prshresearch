@@ -220,3 +220,71 @@ tr.clickable:active { background: rgba(255,255,255,0.05); }
 .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 .loader-text { margin-top: 16px; color: white; font-weight: 500; font-size: 14px; letter-spacing: 0.5px; }
+
+/* Premium Select Group */
+.premium-select-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(20, 20, 25, 0.6);
+  padding: 6px 8px 6px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.02);
+  margin-bottom: 4px;
+}
+.premium-select-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin: 0;
+}
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-1);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 36px 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.select-wrapper select:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.select-wrapper select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+}
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 6px;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%228%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M1.41%200L6%204.58L10.59%200L12%201.41L6%207.41L0%201.41L1.41%200Z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.select-wrapper select option {
+  background: var(--bg-surface);
+  color: var(--text-1);
+}
+:root[data-theme='light'] .premium-select-group { background: #ffffff; border-color: var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+:root[data-theme='light'] .select-wrapper select { background: #f4f4f5; border-color: #e4e4e7; color: #111; }
+:root[data-theme='light'] .select-wrapper select:hover { background: #e4e4e7; }
+:root[data-theme='light'] .select-wrapper select option { background: #fff; color: #111; }

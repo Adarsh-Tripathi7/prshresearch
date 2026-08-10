@@ -121,32 +121,47 @@ TEMPLATE = """<!DOCTYPE html>
       <div class="card">
         <div class="card-header">
           <div class="card-title"><div class="dot" style="background:var(--accent)"></div> High / Low Sequence & Close Position Explorer</div>
-          <div class="segments-scroll"><div class="segments" id="segHlTarget">
-            <button class="active" data-v="break_high_first">Break High 1st</button>
-            <button data-v="break_low_first">Break Low 1st</button>
-            <button data-v="low_first_break_high">Low 1st → Break High</button>
-            <button data-v="high_first_break_low">High 1st → Break Low</button>
-            <button data-v="combined_opp">Combined Opposite</button>
-            <button data-v="compare_both">Compare High vs Low</button>
-          </div></div>
-          <div class="segments-scroll"><div class="segments" id="segClosePosTh">
-            <button class="active" data-v="none">All Closes</button>
-            <button data-v="25%">Top/Bot 25%</button>
-            <button data-v="30%">Top/Bot 30%</button>
-            <button data-v="35%">Top/Bot 35%</button>
-            <button data-v="40%">Top/Bot 40%</button>
-            <button data-v="45%">Top/Bot 45%</button>
-            <button data-v="50%">Top/Bot 50%</button>
-          </div></div>
-          <div class="segments-scroll"><div class="segments" id="segHlSort">
-            <button class="active" data-v="time">Time</button>
-            <button data-v="high_desc">High Break % ↓</button>
-            <button data-v="low_desc">Low Break % ↓</button>
-            <button data-v="low_first_edge">Low 1st Edge ↓</button>
-            <button data-v="high_first_edge">High 1st Edge ↓</button>
-            <button data-v="skew_desc">Direction Skew ↓</button>
-            <button data-v="count_desc">Samples ↓</button>
-          </div></div>
+          <div class="premium-select-group">
+              <label for="segHlTarget">Sequence</label>
+              <div class="select-wrapper">
+                <select id="segHlTarget">
+              <option value="break_high_first" selected>Break High 1st</option>
+              <option value="break_low_first">Break Low 1st</option>
+              <option value="low_first_break_high">Low 1st → Break High</option>
+              <option value="high_first_break_low">High 1st → Break Low</option>
+              <option value="combined_opp">Combined Opposite</option>
+              <option value="compare_both">Compare High vs Low</option>
+                </select>
+              </div>
+            </div>
+          <div class="premium-select-group">
+              <label for="segClosePosTh">Close</label>
+              <div class="select-wrapper">
+                <select id="segClosePosTh">
+              <option value="none" selected>All Closes</option>
+              <option value="25%">Top/Bot 25%</option>
+              <option value="30%">Top/Bot 30%</option>
+              <option value="35%">Top/Bot 35%</option>
+              <option value="40%">Top/Bot 40%</option>
+              <option value="45%">Top/Bot 45%</option>
+              <option value="50%">Top/Bot 50%</option>
+                </select>
+              </div>
+            </div>
+          <div class="premium-select-group">
+              <label for="segHlSort">Sort By</label>
+              <div class="select-wrapper">
+                <select id="segHlSort">
+              <option value="time" selected>Time</option>
+              <option value="high_desc">High Break % ↓</option>
+              <option value="low_desc">Low Break % ↓</option>
+              <option value="low_first_edge">Low 1st Edge ↓</option>
+              <option value="high_first_edge">High 1st Edge ↓</option>
+              <option value="skew_desc">Direction Skew ↓</option>
+              <option value="count_desc">Samples ↓</option>
+                </select>
+              </div>
+            </div>
         </div>
         <div class="card-body"><div id="chartHlFirst" class="echart" style="height:400px"></div></div>
       </div>
