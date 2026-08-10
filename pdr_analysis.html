@@ -21,8 +21,8 @@
 <body>
 
 <header class="app-bar">
-  <div style="display:flex; align-items:center;">
-    <a href="index.html" class="brand" style="margin-right:0;">
+  <div style="display:flex; align-items:center; flex-wrap: wrap; gap: 8px;">
+    <a href="index.html" class="brand" aria-label="Go to Home" style="margin-right:0;">
       <svg class="prsh-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke-width="2"></path>
         <polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke-width="2"></polyline>
@@ -30,7 +30,7 @@
       </svg>
       Prsh <span style="font-weight:400; color:var(--text-3); margin-left:4px;">Capital</span>
     </a>
-    <div style="display:flex; gap:6px; margin-left:12px;">
+    <div style="display:flex; flex-wrap: wrap; gap:6px; margin-left:4px;">
       <button id="themeToggleBtn" style="background:transparent; border:none; cursor:pointer; color:var(--text-2); margin-right:8px; margin-left:8px; display:flex; align-items:center; justify-content:center; padding:4px; transition:color 0.2s;" onmouseover="this.style.color='var(--text-1)'" onmouseout="this.style.color='var(--text-2)'" title="Toggle Theme">
     <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
     <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
