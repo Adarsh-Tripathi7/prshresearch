@@ -417,10 +417,7 @@ tbody tr.clickable:hover{background:rgba(129,140,248,0.06)}
     <div class="section-title" id="hmTitle">Heatmap Explorer</div>
     <div class="controls">
       <div class="seg-group" id="segHmType">
-        <button class="active" data-v="prob">DB Probability</button>
-        <button data-v="ext_db">DB Extension</button>
-        <button data-v="ext_sb">SB Extension</button>
-        <button data-v="ext_ab">All Breaks Ext</button>
+        <button class="active" data-v="ext_ab">All Breaks Ext</button>
         <button data-v="corr">First Side Same Break Prob</button>
       </div>
       <div class="seg-group" id="segHmAsset">
@@ -582,7 +579,7 @@ function showSpotlight(win){
   probData.forEach(d=>{const a=(d.NQ_DB_Prob+d.ES_DB_Prob)/2;if(a<minP){minP=a;minW=d.Window}if(a>maxP){maxP=a;maxW=d.Window}});
 
   $('kpiStrip').innerHTML=`
-    <div class="metric"><div class="metric-label">Windows Analyzed</div><div class="metric-value" style="color:var(--text-1)">81</div><div class="metric-sub">60m rolling · 15m step</div></div>
+    <div class="metric"><div class="metric-label">Windows Analyzed</div><div class="metric-value" style="color:var(--text-1)">81</div><div class="metric-sub">15m rolling | 15m step</div></div>
     <div class="metric"><div class="metric-label">Lowest DB%</div><div class="metric-value" style="color:var(--up)">${minP.toFixed(1)}%</div><div class="metric-sub">${minW}</div></div>
     <div class="metric"><div class="metric-label">Highest DB%</div><div class="metric-value" style="color:var(--dn)">${maxP.toFixed(1)}%</div><div class="metric-sub">${maxW}</div></div>
     <div class="metric"><div class="metric-label">DB% Spread</div><div class="metric-value" style="color:var(--warm)">${(maxP-minP).toFixed(1)}pp</div><div class="metric-sub">Range across all windows</div></div>
@@ -680,8 +677,15 @@ function initPctSel(){
 }
 
 function updateExt(){
-  const d=extData();
+  let d=[...extData()];
   if(!d.length)return;
+  if(window.sortCol) {
+    d.sort((a,b)=>{
+      let va=a[window.sortCol], vb=b[window.sortCol];
+      if(window.sortCol==='Window') return window.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      return window.sortAsc ? va-vb : vb-va;
+    });
+  }
   const asset=segVal('segAsset').toUpperCase();
   const brk=segVal('segBreak')==='double_break'?'Double Break':segVal('segBreak')==='single_break'?'Single Break':'All Breaks';
   const dir={combined:'Combined',high_first:'High First',low_first:'Low First'}[segVal('segDir')];
@@ -712,7 +716,7 @@ function updateExt(){
   const barVals=d.map(r=>r[extPct]);
   ec('chartBar').setOption({
     tooltip:{...TT,trigger:'axis',formatter:ps=>`<b style="color:#ececef">${ps[0].axisValue}</b><br>${extPct}: <b>${ps[0].value.toFixed(2)}R</b>`},
-    grid:{top:10,right:12,bottom:32,left:48},
+    grid:{top:10,right:12,bottom:60,left:48},
     dataZoom:[{type:'inside'}],
     xAxis:{...AXIS_STYLE,type:'category',data:barLabels,axisLabel:{...AXIS_STYLE.axisLabel,rotate:45,fontSize:9}},
     yAxis:{...AXIS_STYLE,type:'value',name:'R'},
@@ -724,7 +728,7 @@ function updateExt(){
   d.forEach(r=>PCT.forEach(p=>{if(p!=='100%'&&r[p]>maxV)maxV=r[p]}));
   function cellBg(v){const t=Math.min(1,v/(maxV||5));return `hsla(${155-t*135},50%,${38-t*10}%,.18)`}
 
-  let th='<tr><th>Window</th>';PCT.forEach(p=>th+=`<th class="r">${p}</th>`);th+='</tr>';
+  let th='<tr><th style="cursor:pointer;user-select:none" onclick="window.sortCol=\'Window\';window.sortAsc=!window.sortAsc;updateExt()">Window'+(window.sortCol==='Window'?(window.sortAsc?'▲':'▼'):'')+'</th>';PCT.forEach(p=>th+=`<th class="r" style="cursor:pointer;user-select:none" onclick="window.sortCol=\'${p}\';window.sortAsc=!window.sortAsc;updateExt()">${p}${window.sortCol===p?(window.sortAsc?'▲':'▼'):''}</th>`);th+='</tr>';
   $('extTHead').innerHTML=th;
 
   let tb='';
@@ -763,6 +767,8 @@ function updateHeatmap(){
     const windows=probData.map(d=>d.Window);
     const data=[];
     probData.forEach((d,yi)=>{data.push([0,yi,+d.NQ_DB_Prob.toFixed(1)]);data.push([1,yi,+d.ES_DB_Prob.toFixed(1)])});
+    document.getElementById('chartHeatmap').style.height = Math.max(620, windows.length * 22 + 100) + 'px';
+    c.resize();
     c.setOption({
       tooltip:{...TT,formatter:p=>`<b style="color:#ececef">${probData[p.value[1]].Window}</b><br>${['NQ','ES'][p.value[0]]}: <b>${p.value[2]}%</b>`},
       xAxis:{type:'category',data:['NQ','ES'],position:'top',axisLabel:{fontFamily:'IBM Plex Mono',fontSize:12,color:'#a0a4ae'},axisLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}},axisTick:{show:false}},
@@ -771,7 +777,7 @@ function updateHeatmap(){
       visualMap:{min:12,max:90,calculable:true,orient:'vertical',right:6,top:'center',
         inRange:{color:['#064e3b','#059669','#34d399','#fbbf24','#f87171','#991b1b']},
         textStyle:{color:'#5e626e',fontFamily:'IBM Plex Mono',fontSize:10}},
-      series:[{type:'heatmap',data:data,label:{show:true,fontFamily:'IBM Plex Mono',fontSize:11,color:'#ececef',formatter:p=>p.value[2]+'%'},
+      series:[{type:'heatmap',data:data,label:{show:true,fontFamily:'IBM Plex Mono',fontSize:10,color:'#ececef',formatter:p=>p.value[2]+'%'},
         emphasis:{itemStyle:{shadowBlur:6,shadowColor:'rgba(0,0,0,.5)'}}}]
     },true);
   }else if(type==='corr'){
@@ -790,6 +796,8 @@ function updateHeatmap(){
         data.push([xi, yi, typeof d[col.key]==='number'?+d[col.key].toFixed(1):0]);
       });
     });
+    document.getElementById('chartHeatmap').style.height = Math.max(620, windows.length * 22 + 100) + 'px';
+    c.resize();
     c.setOption({
       tooltip:{...TT,formatter:p=>`<b style="color:#ececef">${windows[p.value[1]]}</b><br>${cols[p.value[0]].label}: <b>${p.value[2]}%</b>`},
       xAxis:{type:'category',data:cols.map(c=>c.label),position:'top',axisLabel:{fontFamily:'IBM Plex Mono',fontSize:12,color:'#a0a4ae'},axisLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}},axisTick:{show:false}},
@@ -817,6 +825,8 @@ function updateHeatmap(){
       PCT.forEach((p,xi)=>{const v=r[p];if(p!=='100%'&&v>maxV)maxV=v;data.push([xi,yi,typeof v==='number'?+v.toFixed(2):0])});
     });
 
+    document.getElementById('chartHeatmap').style.height = Math.max(620, windows.length * 22 + 100) + 'px';
+    c.resize();
     c.setOption({
       tooltip:{...TT,formatter:p=>`<b style="color:#ececef">${windows[p.value[1]]}</b> · ${PCT[p.value[0]]}<br>Extension: <b>${p.value[2]}R</b>`},
       xAxis:{type:'category',data:PCT,position:'top',axisLabel:{fontFamily:'IBM Plex Mono',fontSize:10,color:'#5e626e'},axisLine:{lineStyle:{color:'rgba(255,255,255,0.06)'}},axisTick:{show:false}},

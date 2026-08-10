@@ -14,10 +14,16 @@ for script in scripts_to_convert:
     with open(script, 'r', encoding='utf-8') as f:
         content = f.read()
         
-    # Window logic modifications: keep 60m window (start_time + 59), change step to 15m
+    # Window logic modifications
+    content = content.replace("start_time + 59", "start_time + 14")
     content = content.replace("start_time += 30", "start_time += 15")
     
     # Text modifications
+    content = content.replace("60-Minute Window", "15-Minute Window")
+    content = content.replace("60-minute Initial Balance", "15-minute Initial Balance")
+    content = content.replace("60-Minute IB Window", "15-Minute IB Window")
+    content = content.replace("60-minute windows", "15-minute windows")
+    content = content.replace("60m rolling", "15m rolling")
     content = content.replace("30m step", "15m step")
     
     # Output file modifications
@@ -51,7 +57,7 @@ dash_content = dash_content.replace('_percentiles.csv"', '_percentiles_15m_step.
 
 # Update Title and texts
 dash_content = dash_content.replace('IB Research Terminal — NQ & ES', 'IB Research Terminal (15m step) — NQ & ES')
-dash_content = dash_content.replace('60m rolling · 30m step', '60m rolling · 15m step')
+dash_content = dash_content.replace('60m rolling · 30m step', '15m rolling | 15m step')
 dash_content = dash_content.replace('>42<', '>81<') # Update the number of windows metric if it has >42<
 dash_content = dash_content.replace(' 42<', ' 81<')
 dash_content = dash_content.replace('>42 ', '>81 ')

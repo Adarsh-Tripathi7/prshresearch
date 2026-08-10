@@ -16,7 +16,7 @@ FILES = [
     r"d:\Antigravity\Dashboard\ib_interactive_dashboard_120m.html"
 ]
 
-OUT_DIR = r"d:\Antigravity\imobile ib dashboard"
+OUT_DIR = r"d:\Antigravity\prshcapital"
 
 if not os.path.exists(OUT_DIR):
     os.makedirs(OUT_DIR)

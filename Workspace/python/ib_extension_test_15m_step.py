@@ -205,11 +205,11 @@ def main():
     labels = []
     start_time = 60 # 18:00
     while start_time <= 1260: # 14:00
-        windows_list.append([start_time, start_time + 59])
+        windows_list.append([start_time, start_time + 14])
         h1 = ((start_time // 60) + 17) % 24
         m1 = start_time % 60
-        h2 = (((start_time + 59) // 60) + 17) % 24
-        m2 = (start_time + 59) % 60
+        h2 = (((start_time + 14) // 60) + 17) % 24
+        m2 = (start_time + 14) % 60
         labels.append(f"{h1:02d}:{m1:02d}-{h2:02d}:{m2:02d}")
         start_time += 15
     

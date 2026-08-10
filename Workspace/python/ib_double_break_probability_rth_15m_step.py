@@ -142,11 +142,11 @@ def main():
     labels = []
     start_time = 60 # 18:00
     while start_time <= 1260: # 14:00
-        windows_list.append([start_time, start_time + 59])
+        windows_list.append([start_time, start_time + 14])
         h1 = ((start_time // 60) + 17) % 24
         m1 = start_time % 60
-        h2 = (((start_time + 59) // 60) + 17) % 24
-        m2 = (start_time + 59) % 60
+        h2 = (((start_time + 14) // 60) + 17) % 24
+        m2 = (start_time + 14) % 60
         labels.append(f"{h1:02d}:{m1:02d}-{h2:02d}:{m2:02d}")
         start_time += 15
     
@@ -192,7 +192,7 @@ def main():
     plt.figure(figsize=(8, 16))
     sns.heatmap(hm_df, annot=True, fmt=".1f", cmap="OrRd", cbar_kws={'label': 'Double Break Probability (%)'})
     plt.title('Probability of Double Break by RTH Close (16:00 EST)')
-    plt.ylabel('Rolling 60-Minute IB Window')
+    plt.ylabel('Rolling 15-Minute IB Window')
     plt.xlabel('Asset')
     plt.tight_layout()
     
@@ -211,7 +211,7 @@ def main():
         return res
         
     report = f"""# 🎲 Base-Rate Probability: Double Breaks by RTH Close
-*What is the raw statistical probability that a given 60-minute Initial Balance will eventually suffer a Double Break before the 16:00 EST market close?*
+*What is the raw statistical probability that a given 15-minute Initial Balance will eventually suffer a Double Break before the 16:00 EST market close?*
 
 ## 📊 Probability Heatmap
 ![Double Break Probability Heatmap](file:///{plots_path.replace('\\', '/')})
