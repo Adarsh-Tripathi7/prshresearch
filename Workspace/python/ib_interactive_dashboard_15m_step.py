@@ -579,7 +579,7 @@ function showSpotlight(win){
   probData.forEach(d=>{const a=(d.NQ_DB_Prob+d.ES_DB_Prob)/2;if(a<minP){minP=a;minW=d.Window}if(a>maxP){maxP=a;maxW=d.Window}});
 
   $('kpiStrip').innerHTML=`
-    <div class="metric"><div class="metric-label">Windows Analyzed</div><div class="metric-value" style="color:var(--text-1)">81</div><div class="metric-sub">15m rolling | 15m step</div></div>
+    <div class="metric"><div class="metric-label">Windows Analyzed</div><div class="metric-value" style="color:var(--text-1)">81</div><div class="metric-sub">15m rolling | 1m step</div></div>
     <div class="metric"><div class="metric-label">Lowest DB%</div><div class="metric-value" style="color:var(--up)">${minP.toFixed(1)}%</div><div class="metric-sub">${minW}</div></div>
     <div class="metric"><div class="metric-label">Highest DB%</div><div class="metric-value" style="color:var(--dn)">${maxP.toFixed(1)}%</div><div class="metric-sub">${maxW}</div></div>
     <div class="metric"><div class="metric-label">DB% Spread</div><div class="metric-value" style="color:var(--warm)">${(maxP-minP).toFixed(1)}pp</div><div class="metric-sub">Range across all windows</div></div>

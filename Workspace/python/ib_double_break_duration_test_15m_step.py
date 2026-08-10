@@ -152,7 +152,7 @@ def main():
         h2 = (((start_time + 14) // 60) + 17) % 24
         m2 = (start_time + 14) % 60
         labels.append(f"{h1:02d}:{m1:02d}-{h2:02d}:{m2:02d}")
-        start_time += 15
+        start_time += 1
     
     windows_arr = np.array(windows_list, dtype=np.int32)
     
