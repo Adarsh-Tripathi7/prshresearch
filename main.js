@@ -1016,7 +1016,16 @@ function updateHeatmap() {
   const c = ec('chartHeatmap'); const dom = c.getDom();
   
   const type = segVal('segHmType'); const dir = segVal('segHmDir');
-  dom.style.minWidth = '';
+  let reqWidth = 'auto';
+  if (type.startsWith('ext_')) {
+    reqWidth = (extLabels.length * 45 + 80);
+    dom.style.width = reqWidth + 'px';
+  } else if (type === 'corr') {
+    reqWidth = 400;
+    dom.style.width = reqWidth + 'px';
+  } else {
+    dom.style.width = '100%';
+  }
   
   if (!c._hasSort) {
     c.on('click', function(p) {
@@ -1036,7 +1045,7 @@ function updateHeatmap() {
   }
   
   const sortIndic = val => {
-      if (hmSortCol === val && hmSortDir !== 0) return hmSortDir === -1 ? ' ↓' : ' ↑';
+      if (hmSortCol === val && hmSortDir !== 0) return hmSortDir === -1 ? ' ▼' : ' ▲';
       return '';
   };
   
@@ -1055,7 +1064,8 @@ function updateHeatmap() {
     }
     const windows = sortedProb.map(d => d.Window);
     const reqHeight = Math.max(400, windows.length * 30);
-    dom.style.height = reqHeight + 'px'; c.resize();
+    dom.style.height = reqHeight + 'px';
+    if (reqWidth === '100%') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
     
     const data = [];
     if (globalAsset === 'both') {
@@ -1065,7 +1075,7 @@ function updateHeatmap() {
       c.setOption({
         tooltip: TT, xAxis: { type: 'category', data: [lblNQ, lblES], position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 13, fontWeight: 'bold' }, triggerEvent: true },
         yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-        grid: { top: 40, right: 10, bottom: 10, left: 0, containLabel: true },
+        grid: { top: 40, right: 10, bottom: 10, left: 75, containLabel: false },
         visualMap: { show: false, min: 20, max: 90, inRange: { color: ['#0f172a', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'] } },
         series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
       }, {replaceMerge: ["series"]});
@@ -1078,7 +1088,7 @@ function updateHeatmap() {
       c.setOption({
         tooltip: TT, xAxis: { type: 'category', data: [lblAsset], position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 13, fontWeight: 'bold' }, triggerEvent: true },
         yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-        grid: { top: 40, right: 10, bottom: 10, left: 0, containLabel: true },
+        grid: { top: 40, right: 10, bottom: 10, left: 75, containLabel: false },
         visualMap: { show: false, min: 20, max: 90, inRange: { color: ['#0f172a', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'] } },
         series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
       }, {replaceMerge: ["series"]});
@@ -1097,13 +1107,14 @@ function updateHeatmap() {
     
     const windows = sortedCorr.map(d => d.Window);
     const reqHeight = Math.max(400, windows.length * 30);
-    dom.style.height = reqHeight + 'px'; c.resize();
+    dom.style.height = reqHeight + 'px';
+    if (reqWidth === '100%') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
     
     const data = []; sortedCorr.forEach((d, yi) => cols.forEach((col, xi) => data.push([xi, yi, typeof d[col.key]==='number'?+d[col.key].toFixed(1):0])));
     c.setOption({
       tooltip: TT, xAxis: { type: 'category', data: cols.map(c=>c.label + sortIndic(c.label)), position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 10, rotate: 30 }, triggerEvent: true },
       yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-      grid: { top: 50, right: 10, bottom: 10, left: 0, containLabel: true },
+      grid: { top: 50, right: 10, bottom: 10, left: 75, containLabel: false },
       visualMap: { show: false, min: 65, max: 85, inRange: { color: ['#2e1065', '#4c1d95', '#5b21b6', '#6d28d9', '#7c3aed', '#8b5cf6'] } },
       series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' } }]
     }, {replaceMerge: ["series"]});
@@ -1139,7 +1150,8 @@ function updateHeatmap() {
     
     const windows = sortedRef.map(r => r.Window);
     const reqHeight = Math.max(400, windows.length * 30);
-    dom.style.height = reqHeight + 'px'; c.resize();
+    dom.style.height = reqHeight + 'px';
+    if (reqWidth === '100%') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
     
     const data = []; let maxV = 0;
     
@@ -1167,11 +1179,7 @@ function updateHeatmap() {
     c.setOption({
       tooltip: TT, xAxis: { type: 'category', data: extLabels.map(p => p + sortIndic(p)), position: 'top', axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#a1a1aa', fontSize: 11 }, triggerEvent: true },
       yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
-      grid: { top: 40, right: 10, bottom: 25, left: 0, containLabel: true },
-      dataZoom: [
-        { type: 'inside', xAxisIndex: 0, zoomOnMouseWheel: false, moveOnMouseMove: true, moveOnMouseWheel: true },
-        { type: 'slider', xAxisIndex: 0, height: 12, bottom: 0, borderColor: 'transparent', backgroundColor: 'rgba(255,255,255,0.05)', fillerColor: 'rgba(255,255,255,0.2)', handleStyle: { color: '#fff' }, showDetail: false, start: 0, end: window.innerWidth < 768 ? 40 : 100 }
-      ],
+      grid: { top: 40, right: 10, bottom: 25, left: 75, containLabel: false },
       visualMap: { show: false, min: 1, max: maxV || 5, inRange: { color: ['#022c22', '#064e3b', '#065f46', '#047857', '#059669', '#10b981', '#34d399', '#6ee7b7'] } },
       series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2].toFixed(2) }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
     }, {replaceMerge: ["series"]});
@@ -1191,6 +1199,9 @@ if ('serviceWorker' in navigator) {
 }
 
 setTimeout(resizeAll, 100);
+if (document.fonts) {
+  document.fonts.ready.then(() => setTimeout(resizeAll, 50));
+}
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js');
