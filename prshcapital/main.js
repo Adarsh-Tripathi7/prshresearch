@@ -1065,7 +1065,7 @@ function updateHeatmap() {
     const windows = sortedProb.map(d => d.Window);
     const reqHeight = Math.max(400, windows.length * 30);
     dom.style.height = reqHeight + 'px';
-    if (reqWidth === '100%') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
+    if (reqWidth === 'auto') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
     
     const data = [];
     if (globalAsset === 'both') {
@@ -1108,7 +1108,7 @@ function updateHeatmap() {
     const windows = sortedCorr.map(d => d.Window);
     const reqHeight = Math.max(400, windows.length * 30);
     dom.style.height = reqHeight + 'px';
-    if (reqWidth === '100%') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
+    if (reqWidth === 'auto') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
     
     const data = []; sortedCorr.forEach((d, yi) => cols.forEach((col, xi) => data.push([xi, yi, typeof d[col.key]==='number'?+d[col.key].toFixed(1):0])));
     c.setOption({
@@ -1151,7 +1151,7 @@ function updateHeatmap() {
     const windows = sortedRef.map(r => r.Window);
     const reqHeight = Math.max(400, windows.length * 30);
     dom.style.height = reqHeight + 'px';
-    if (reqWidth === '100%') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
+    if (reqWidth === 'auto') c.resize({height: reqHeight}); else c.resize({width: parseInt(reqWidth), height: reqHeight});
     
     const data = []; let maxV = 0;
     
