@@ -1016,14 +1016,14 @@ function updateHeatmap() {
   const c = ec('chartHeatmap'); const dom = c.getDom();
   
   const type = segVal('segHmType'); const dir = segVal('segHmDir');
-  let reqWidth = 'auto';
   if (type.startsWith('ext_')) {
-    reqWidth = (extLabels.length * 45 + 80);
-    dom.style.width = reqWidth + 'px';
+    dom.style.minWidth = (extLabels.length * 45 + 80) + 'px';
+    dom.style.width = '100%';
   } else if (type === 'corr') {
-    reqWidth = 400;
-    dom.style.width = reqWidth + 'px';
+    dom.style.minWidth = '400px';
+    dom.style.width = '100%';
   } else {
+    dom.style.minWidth = '0';
     dom.style.width = '100%';
   }
   

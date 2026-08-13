@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prsh-cache-v26';
+const CACHE_NAME = 'prsh-cache-v27';
 const PRECACHE_URLS = [
   '/prshresearch/',
   '/prshresearch/index.html?bust=1',
