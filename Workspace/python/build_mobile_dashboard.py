@@ -4,16 +4,17 @@ import json
 import csv
 
 FILES = [
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_7m_1m_step.html",
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_7m.html",
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_10m.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_45m.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_45m_1m_step.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_30m_15m_step.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_30m_1m_step.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_30m.html",
     r"d:\Antigravity\Dashboard\ib_interactive_dashboard_15m_step.html",
     r"d:\Antigravity\Dashboard\ib_interactive_dashboard_15m.html",
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_30m_15m_step.html",
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_30m.html",
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_45m.html",
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_60m.html",
-    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_120m.html"
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_10m.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_10m_1m_step.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_7m_1m_step.html",
+    r"d:\Antigravity\Dashboard\ib_interactive_dashboard_7m.html"
 ]
 
 OUT_DIR = r"d:\Antigravity\prshcapital"
