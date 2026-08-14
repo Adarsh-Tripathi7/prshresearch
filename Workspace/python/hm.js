@@ -16,7 +16,7 @@ function updateHeatmap() {
   }
   
   const sortIndic = val => {
-      if (hmSortCol === val && hmSortDir !== 0) return hmSortDir === -1 ? ' ↓' : ' ↑';
+      if (hmSortCol === val && hmSortDir !== 0) return hmSortDir === -1 ? ' ▼' : ' ▲';
       return '';
   };
   
