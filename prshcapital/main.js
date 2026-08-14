@@ -226,9 +226,9 @@ function showSpotlight(win) {
   const currentView = document.querySelector('.page.active')?.id || 'page-overview';
   let html = '';
   
-  const showProb = currentView === 'page-overview' || currentView === 'page-probability';
-  const showExt = currentView === 'page-overview' || currentView === 'page-extensions';
-  const showHlFirst = currentView === 'page-overview' || currentView === 'page-hl_first';
+  const showProb = currentView === 'page-overview' || currentView === 'page-probability' || currentView === 'page-heatmap';
+  const showExt = currentView === 'page-overview' || currentView === 'page-extensions' || currentView === 'page-heatmap';
+  const showHlFirst = currentView === 'page-overview' || currentView === 'page-hl_first' || currentView === 'page-heatmap';
 
   const assets = globalAsset === 'both' ? ['nq', 'es'] : [globalAsset];
 
@@ -252,7 +252,7 @@ function showSpotlight(win) {
   }
 
   if (showExt) {
-    if (currentView === 'page-overview') {
+    if (currentView === 'page-overview' || currentView === 'page-heatmap') {
       for (const asset of assets) {
         for (const brk of ['double_break','single_break']) {
           const d = EXT[asset]?.[brk]?.combined; if (!d) continue;
@@ -303,7 +303,7 @@ function showSpotlight(win) {
         }
         html += `<div class="spot-card"><div class="spot-card-title">H/L First (${dir})</div>${inner}</div>`;
       }
-    } else if (currentView === 'page-overview') {
+    } else if (currentView === 'page-overview' || currentView === 'page-heatmap') {
         let inner = '';
         for (const asset of assets) {
           const u = asset.toUpperCase();
