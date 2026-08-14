@@ -226,9 +226,12 @@ function showSpotlight(win) {
   const currentView = document.querySelector('.page.active')?.id || 'page-overview';
   let html = '';
   
-  const showProb = currentView === 'page-overview' || currentView === 'page-probability' || currentView === 'page-heatmap';
-  const showExt = currentView === 'page-overview' || currentView === 'page-extensions' || currentView === 'page-heatmap';
-  const showHlFirst = currentView === 'page-overview' || currentView === 'page-hl_first' || currentView === 'page-heatmap';
+  const hmType = segVal('segHmType');
+  const isHeatmap = currentView === 'page-heatmap';
+  const showProb = currentView === 'page-overview' || currentView === 'page-probability' || (isHeatmap && hmType === 'prob');
+  const showExt = currentView === 'page-overview' || currentView === 'page-extensions' || (isHeatmap && hmType.startsWith('ext_'));
+  const showHlFirst = currentView === 'page-overview' || currentView === 'page-hl_first';
+  const showCorr = isHeatmap && hmType === 'corr';
 
   const assets = globalAsset === 'both' ? ['nq', 'es'] : [globalAsset];
 
@@ -252,16 +255,20 @@ function showSpotlight(win) {
   }
 
   if (showExt) {
-    if (currentView === 'page-overview' || currentView === 'page-heatmap') {
+    if (currentView === 'page-overview' || (isHeatmap && (hmType === 'ext_db' || hmType === 'ext_sb'))) {
       for (const asset of assets) {
         for (const brk of ['double_break','single_break']) {
+          // If on heatmap, only show the one we are looking at
+          if (isHeatmap && hmType === 'ext_db' && brk !== 'double_break') continue;
+          if (isHeatmap && hmType === 'ext_sb' && brk !== 'single_break') continue;
+          
           const d = EXT[asset]?.[brk]?.combined; if (!d) continue;
           const row = d.find(r => r.Window === win); if (!row) continue;
           const lbl = `${asset.toUpperCase()} ${brk==='double_break'?'DB':'SB'}`;
           html += `<div class="spot-card"><div class="spot-card-title">${lbl} (Combined)</div><div class="spot-row"><span class="lbl">Median</span><span class="val" style="color:var(--warm)">${row['50%']?.toFixed(2)||'—'}R</span></div><div class="spot-row"><span class="lbl">90th pctl</span><span class="val" style="color:var(--accent)">${row['90%']?.toFixed(2)||'—'}R</span></div></div>`;
         }
       }
-    } else if (currentView === 'page-extensions') {
+    } else if (currentView === 'page-extensions' || (isHeatmap && hmType === 'ext_all')) {
       for (const asset of assets) {
         for (const direction of ['combined', 'high_first', 'low_first']) {
           const d = EXT[asset]?.['all_breaks']?.[direction]; if (!d) continue;
@@ -303,7 +310,7 @@ function showSpotlight(win) {
         }
         html += `<div class="spot-card"><div class="spot-card-title">H/L First (${dir})</div>${inner}</div>`;
       }
-    } else if (currentView === 'page-overview' || currentView === 'page-heatmap') {
+    } else if (currentView === 'page-overview') {
         let inner = '';
         for (const asset of assets) {
           const u = asset.toUpperCase();
@@ -313,6 +320,18 @@ function showSpotlight(win) {
           inner += `<div class="spot-row"><span class="lbl">${u} Cond Opp Break</span><span class="val c-mono" style="color:var(--accent)">${cond?.toFixed(1) || '—'}%</span></div>`;
         }
         html += `<div class="spot-card"><div class="spot-card-title">H/L First (Combined)</div>${inner}</div>`;
+    }
+  }
+
+  if (showCorr && corrData) {
+    const cRow = corrData.find(d => d.Window === win);
+    if (cRow) {
+      let inner = '';
+      inner += `<div class="spot-row"><span class="lbl">ES Lead ↑ (NQ Follows)</span><span class="val c-mono" style="color:var(--up)">${cRow['ES High Break (NQ Follows)']?.toFixed(1) || '—'}%</span></div>`;
+      inner += `<div class="spot-row"><span class="lbl">ES Lead ↓ (NQ Follows)</span><span class="val c-mono" style="color:var(--dn)">${cRow['ES Low Break (NQ Follows)']?.toFixed(1) || '—'}%</span></div>`;
+      inner += `<div class="spot-row"><span class="lbl">NQ Lead ↑ (ES Follows)</span><span class="val c-mono" style="color:var(--up)">${cRow['NQ High Break (ES Follows)']?.toFixed(1) || '—'}%</span></div>`;
+      inner += `<div class="spot-row"><span class="lbl">NQ Lead ↓ (ES Follows)</span><span class="val c-mono" style="color:var(--dn)">${cRow['NQ Low Break (ES Follows)']?.toFixed(1) || '—'}%</span></div>`;
+      html += `<div class="spot-card"><div class="spot-card-title">Leader / Lagger Correlation</div>${inner}</div>`;
     }
   }
   
