@@ -47,14 +47,8 @@ window.loadTimeframeData = async function(tf) {
   const loader = $('loader');
   if (loader) loader.classList.add('active');
   try {
-    const res = await fetch(`data/${tf}.msgpack`);
-    const buffer = await res.arrayBuffer();
-    window._D = MessagePack.decode(buffer);
-    // Convert any BigInt values to Number (msgpack may decode ints as BigInt)
-    (function convertBigInt(obj) {
-      if (Array.isArray(obj)) { for (let i = 0; i < obj.length; i++) { if (typeof obj[i] === 'bigint') obj[i] = Number(obj[i]); else if (typeof obj[i] === 'object' && obj[i] !== null) convertBigInt(obj[i]); } }
-      else if (typeof obj === 'object' && obj !== null) { for (const k in obj) { if (typeof obj[k] === 'bigint') obj[k] = Number(obj[k]); else if (typeof obj[k] === 'object' && obj[k] !== null) convertBigInt(obj[k]); } }
-    })(window._D);
+    const res = await fetch(`data/${tf}.json`);
+    window._D = await res.json();
     window.applySessionFilter();
     
     const labelMatch = tf.match(/time_range_(.+)/);
@@ -560,17 +554,31 @@ function updateProb() {
     });
   });
   
-  let h = '';
-  mappedData.forEach(d => {
-    const avg = d.avg; const delta = d.delta; const dc = delta > 0 ? 'c-dn' : 'c-up'; const bg = avg > 75 ? 'hl' : '';
-    
-    h += `<tr class="${bg}"><td class="c-mono">${d.Window}</td>`;
-    if (showNq) h += `<td class="r c-mono">${d.nq.toFixed(1)}</td>`;
-    if (showEs) h += `<td class="r c-mono">${d.es.toFixed(1)}</td>`;
-    if (showAvg) h += `<td class="r c-mono">${avg.toFixed(1)}</td><td class="r c-mono ${dc}">${delta>0?'+':''}${delta.toFixed(1)}</td>`;
-    h += `</tr>`;
-  });
-  $('tblProb').innerHTML = h;
+  const tbody = $('tblProb');
+  tbody.innerHTML = '';
+  if (!window._probRenderId) window._probRenderId = 0;
+  const renderId = ++window._probRenderId;
+  let chunkIdx = 0;
+
+  function renderChunk() {
+    if (window._probRenderId !== renderId) return;
+    let h = '';
+    const end = Math.min(chunkIdx + 100, mappedData.length);
+    for (let i = chunkIdx; i < end; i++) {
+      const d = mappedData[i];
+      const avg = d.avg; const delta = d.delta; const dc = delta > 0 ? 'c-dn' : 'c-up'; const bg = avg > 75 ? 'hl' : '';
+      
+      h += `<tr class="${bg}"><td class="c-mono">${d.Window}</td>`;
+      if (showNq) h += `<td class="r c-mono">${d.nq.toFixed(1)}</td>`;
+      if (showEs) h += `<td class="r c-mono">${d.es.toFixed(1)}</td>`;
+      if (showAvg) h += `<td class="r c-mono">${avg.toFixed(1)}</td><td class="r c-mono ${dc}">${delta>0?'+':''}${delta.toFixed(1)}</td>`;
+      h += `</tr>`;
+    }
+    tbody.insertAdjacentHTML('beforeend', h);
+    chunkIdx = end;
+    if (chunkIdx < mappedData.length) requestAnimationFrame(renderChunk);
+  }
+  renderChunk();
 }
 updateProb();
 
@@ -841,39 +849,53 @@ function updateHlFirst() {
     });
   });
   
-  let h = '';
-  mappedData.forEach(d => {
-    const avg = d.avg;
-    const delta = d.delta;
-    const dc = delta > 0 ? 'c-dn' : delta < 0 ? 'c-up' : '';
-    const bg = avg > 75 ? 'hl' : '';
-    
-    h += `<tr class="${bg}"><td class="c-mono">${d.Window}</td>`;
-    if (isCompare) {
-      if (showNq) {
-        h += `<td class="r c-mono" style="color:#10b981;">${d.nq_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.nq_low.toFixed(1)}%</td>`;
+  const tbody = $('tblHlFirst');
+  tbody.innerHTML = '';
+  if (!window._hlFirstRenderId) window._hlFirstRenderId = 0;
+  const renderId = ++window._hlFirstRenderId;
+  let chunkIdx = 0;
+
+  function renderChunk() {
+    if (window._hlFirstRenderId !== renderId) return;
+    let h = '';
+    const end = Math.min(chunkIdx + 100, mappedData.length);
+    for (let i = chunkIdx; i < end; i++) {
+      const d = mappedData[i];
+      const avg = d.avg;
+      const delta = d.delta;
+      const dc = delta > 0 ? 'c-dn' : delta < 0 ? 'c-up' : '';
+      const bg = avg > 75 ? 'hl' : '';
+      
+      h += `<tr class="${bg}"><td class="c-mono">${d.Window}</td>`;
+      if (isCompare) {
+        if (showNq) {
+          h += `<td class="r c-mono" style="color:#10b981;">${d.nq_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.nq_low.toFixed(1)}%</td>`;
+        }
+        if (showEs) {
+          h += `<td class="r c-mono" style="color:#10b981;">${d.es_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.es_low.toFixed(1)}%</td>`;
+        }
+        if (showAvg) {
+          h += `<td class="r c-mono" style="color:#10b981;">${d.avg_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.avg_low.toFixed(1)}%</td>`;
+        }
+        h += `<td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.tot}</td>`;
+      } else {
+        if (showNq) {
+          h += `<td class="r c-mono">${d.nq.toFixed(1)}%</td><td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.nq_tot}</td>`;
+        }
+        if (showEs) {
+          h += `<td class="r c-mono">${d.es.toFixed(1)}%</td><td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.es_tot}</td>`;
+        }
+        if (showAvg) {
+          h += `<td class="r c-mono">${avg.toFixed(1)}%</td><td class="r c-mono ${dc}">${delta > 0 ? '+' : ''}${delta.toFixed(1)}%</td>`;
+        }
       }
-      if (showEs) {
-        h += `<td class="r c-mono" style="color:#10b981;">${d.es_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.es_low.toFixed(1)}%</td>`;
-      }
-      if (showAvg) {
-        h += `<td class="r c-mono" style="color:#10b981;">${d.avg_high.toFixed(1)}%</td><td class="r c-mono" style="color:#ef4444;">${d.avg_low.toFixed(1)}%</td>`;
-      }
-      h += `<td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.tot}</td>`;
-    } else {
-      if (showNq) {
-        h += `<td class="r c-mono">${d.nq.toFixed(1)}%</td><td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.nq_tot}</td>`;
-      }
-      if (showEs) {
-        h += `<td class="r c-mono">${d.es.toFixed(1)}%</td><td class="r c-mono" style="color:var(--text-3); font-size:11px;">${d.es_tot}</td>`;
-      }
-      if (showAvg) {
-        h += `<td class="r c-mono">${avg.toFixed(1)}%</td><td class="r c-mono ${dc}">${delta > 0 ? '+' : ''}${delta.toFixed(1)}%</td>`;
-      }
+      h += `</tr>`;
     }
-    h += `</tr>`;
-  });
-  $('tblHlFirst').innerHTML = h;
+    tbody.insertAdjacentHTML('beforeend', h);
+    chunkIdx = end;
+    if (chunkIdx < mappedData.length) requestAnimationFrame(renderChunk);
+  }
+  renderChunk();
 }
 
 initSeg('segHlTarget', updateHlFirst);
@@ -975,35 +997,56 @@ function updateExt() {
   
   function cellBg(v) { const t = Math.min(1, v / (maxV || 5)); return `hsla(${155 - t * 135}, 50%, ${38 - t * 10}%, .18)`; }
   
-  let tb = '';
-  d.forEach((r, i) => {
-    const cls = i === extWin ? ' class="hl clickable"' : ' class="clickable"';
-    
-    if (assets.length === 1) {
-      tb += `<tr${cls} data-i="${i}"><td class="c-mono">${r.Window}</td>`;
-      PCT.forEach(p => { const v = r[p]; tb += `<td class="r c-mono" style="background:${typeof v==='number' ? cellBg(v) : 'transparent'}">${typeof v==='number' ? v.toFixed(2) : v}</td>`; });
-      tb += '</tr>';
-    } else {
-      // Both NQ and ES rows
-      const nqRow = extData('nq').find(x => x.Window === r.Window);
-      const esRow = extData('es').find(x => x.Window === r.Window);
+  const tbody = $('extTBody');
+  tbody.innerHTML = '';
+  if (!window._extRenderId) window._extRenderId = 0;
+  const renderId = ++window._extRenderId;
+  let chunkIdx = 0;
+
+  function renderChunk() {
+    if (window._extRenderId !== renderId) return;
+    let tb = '';
+    const end = Math.min(chunkIdx + 50, d.length);
+    for (let i = chunkIdx; i < end; i++) {
+      const r = d[i];
+      const cls = i === extWin ? ' class="hl clickable"' : ' class="clickable"';
       
-      if (nqRow) {
-        tb += `<tr${cls} data-i="${i}"><td class="c-mono">${r.Window}</td><td class="c-mono" style="color:#6366f1">NQ</td>`;
-        PCT.forEach(p => { const v = nqRow[p]; tb += `<td class="r c-mono" style="background:${typeof v==='number' ? cellBg(v) : 'transparent'}">${typeof v==='number' ? v.toFixed(2) : v}</td>`; });
+      if (assets.length === 1) {
+        tb += `<tr${cls} data-i="${i}"><td class="c-mono">${r.Window}</td>`;
+        PCT.forEach(p => { const v = r[p]; tb += `<td class="r c-mono" style="background:${typeof v==='number' ? cellBg(v) : 'transparent'}">${typeof v==='number' ? v.toFixed(2) : v}</td>`; });
         tb += '</tr>';
-      }
-      if (esRow) {
-        // Only trigger click event once per window group, apply styling to both
-        tb += `<tr${cls} data-i="${i}"><td class="c-mono" style="border-top:none;color:transparent">${r.Window}</td><td class="c-mono" style="color:#38bdf8">ES</td>`;
-        PCT.forEach(p => { const v = esRow[p]; tb += `<td class="r c-mono" style="background:${typeof v==='number' ? cellBg(v) : 'transparent'}">${typeof v==='number' ? v.toFixed(2) : v}</td>`; });
-        tb += '</tr>';
+      } else {
+        const nqRow = extData('nq').find(x => x.Window === r.Window);
+        const esRow = extData('es').find(x => x.Window === r.Window);
+        
+        if (nqRow) {
+          tb += `<tr${cls} data-i="${i}"><td class="c-mono">${r.Window}</td><td class="c-mono" style="color:#6366f1">NQ</td>`;
+          PCT.forEach(p => { const v = nqRow[p]; tb += `<td class="r c-mono" style="background:${typeof v==='number' ? cellBg(v) : 'transparent'}">${typeof v==='number' ? v.toFixed(2) : v}</td>`; });
+          tb += '</tr>';
+        }
+        if (esRow) {
+          tb += `<tr${cls} data-i="${i}"><td class="c-mono" style="border-top:none;color:transparent">${r.Window}</td><td class="c-mono" style="color:#38bdf8">ES</td>`;
+          PCT.forEach(p => { const v = esRow[p]; tb += `<td class="r c-mono" style="background:${typeof v==='number' ? cellBg(v) : 'transparent'}">${typeof v==='number' ? v.toFixed(2) : v}</td>`; });
+          tb += '</tr>';
+        }
       }
     }
-  });
+    tbody.insertAdjacentHTML('beforeend', tb);
+    chunkIdx = end;
+    if (chunkIdx < d.length) requestAnimationFrame(renderChunk);
+  }
+  renderChunk();
   
-  $('extTBody').innerHTML = tb;
-  $$('#extTBody tr.clickable').forEach(tr => tr.addEventListener('click', () => { extWin = parseInt(tr.dataset.i); updateExt(); }));
+  if (!window._extClickBound) {
+    $('extTBody').addEventListener('click', (e) => {
+      const tr = e.target.closest('tr.clickable');
+      if (tr && tr.dataset.i !== undefined) {
+        extWin = parseInt(tr.dataset.i);
+        updateExt();
+      }
+    });
+    window._extClickBound = true;
+  }
 }
 initSeg('segBreak', () => { extWin = 0; extSortDir = 0; updateExt(); });
 initSeg('segDir', () => { extWin = 0; extSortDir = 0; updateExt(); });
@@ -1077,7 +1120,7 @@ function updateHeatmap() {
         yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
         grid: { top: 40, right: 10, bottom: 10, left: 75, containLabel: false },
         visualMap: { show: false, min: 20, max: 90, inRange: { color: ['#0f172a', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'] } },
-        series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
+        series: [{ type: 'heatmap', data: data, progressive: 200, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
       }, {replaceMerge: ["series"]});
     } else {
       const lblAsset = globalAsset.toUpperCase() + sortIndic(globalAsset.toUpperCase());
@@ -1090,7 +1133,7 @@ function updateHeatmap() {
         yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
         grid: { top: 40, right: 10, bottom: 10, left: 75, containLabel: false },
         visualMap: { show: false, min: 20, max: 90, inRange: { color: ['#0f172a', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'] } },
-        series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
+        series: [{ type: 'heatmap', data: data, progressive: 200, label: { show: true, color: '#fff', fontSize: 11, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
       }, {replaceMerge: ["series"]});
     }
   } else if (type === 'corr') {
@@ -1116,7 +1159,7 @@ function updateHeatmap() {
       yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
       grid: { top: 50, right: 10, bottom: 10, left: 75, containLabel: false },
       visualMap: { show: false, min: 65, max: 85, inRange: { color: ['#2e1065', '#4c1d95', '#5b21b6', '#6d28d9', '#7c3aed', '#8b5cf6'] } },
-      series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' } }]
+      series: [{ type: 'heatmap', data: data, progressive: 200, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2]+'%' } }]
     }, {replaceMerge: ["series"]});
   } else {
     $('hmDirWrap').style.display = 'inline-flex';
@@ -1181,7 +1224,7 @@ function updateHeatmap() {
       yAxis: { type: 'category', data: windows, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#71717a', fontSize: 10, fontFamily: 'IBM Plex Mono' } },
       grid: { top: 40, right: 10, bottom: 25, left: 75, containLabel: false },
       visualMap: { show: false, min: 1, max: maxV || 5, inRange: { color: ['#022c22', '#064e3b', '#065f46', '#047857', '#059669', '#10b981', '#34d399', '#6ee7b7'] } },
-      series: [{ type: 'heatmap', data: data, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2].toFixed(2) }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
+      series: [{ type: 'heatmap', data: data, progressive: 200, label: { show: true, color: '#fff', fontSize: 10, textShadowColor: 'rgba(0,0,0,0.8)', textShadowBlur: 2, formatter: p=>p.value[2].toFixed(2) }, emphasis: { itemStyle: { borderColor: '#fff', borderWidth: 1 } } }]
     }, {replaceMerge: ["series"]});
   }
 }
