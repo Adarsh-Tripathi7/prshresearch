@@ -228,10 +228,10 @@ function showSpotlight(win) {
   
   const hmType = segVal('segHmType');
   const isHeatmap = currentView === 'page-heatmap';
-  const showProb = currentView === 'page-overview' || currentView === 'page-probability' || (isHeatmap && hmType === 'prob');
-  const showExt = currentView === 'page-overview' || currentView === 'page-extensions' || (isHeatmap && hmType.startsWith('ext_'));
+  const showProb = currentView === 'page-overview' || currentView === 'page-probability';
+  const showExt = currentView === 'page-overview' || currentView === 'page-extensions';
   const showHlFirst = currentView === 'page-overview' || currentView === 'page-hl_first';
-  const showCorr = isHeatmap && hmType === 'corr';
+  const showCorr = currentView === 'page-overview' || isHeatmap;
 
   const assets = globalAsset === 'both' ? ['nq', 'es'] : [globalAsset];
 
