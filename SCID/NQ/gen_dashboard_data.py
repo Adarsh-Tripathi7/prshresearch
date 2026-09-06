@@ -11,8 +11,10 @@ SESSION_START = 18
 PCTS = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
 
 df = pd.read_csv(os.path.join(DATA_DIR, "nq_break_results.csv"))
+df = df.sort_values(['trading_day', 'file'])
+df = df.drop_duplicates(subset=['trading_day', 'hour_label'], keep='last')
 df['initial_ext_r'] = np.where(df['type'] == 2, df['max_ext_before_double_r'], df['max_ext_r'])
-print(f"Loaded {len(df)} rows")
+print(f"Loaded {len(df)} deduplicated rows")
 
 # Window labels like the reference: "18:00-18:59", etc.
 def block_to_window(bi):
